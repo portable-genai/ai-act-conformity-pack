@@ -1,0 +1,18 @@
+# Golden conformity cases (obviously fictional). Fields: id, system, expected_tier,
+# expected_conditional, planted. `expected_tier` and `expected_conditional` are the INDEPENDENT
+# ORACLE: they are labelled here, in the dataset, NOT read back from the pipeline's own verdict,
+# so the tier_accuracy metric scores the engine against an external truth and can genuinely go
+# red. `planted` is a raw identifier the redact-before-audit step must mask, so pii_safety goes
+# red if any raw identifier survives into an audit record. Every `system` is a card in the
+# offline fixture fleet. g7 plants the identifier in the card DESCRIPTION, which becomes the
+# citation snippet; g8 plants it in the card NAME, which becomes the citation source_id and
+# title. Both halves are scored, because a scan that reads one field is a scan that certifies
+# the other.
+{"id": "g1", "system": "credit-decision-copilot", "expected_tier": "high", "expected_conditional": false}
+{"id": "g2", "system": "hr-cv-screener", "expected_tier": "high", "expected_conditional": false}
+{"id": "g3", "system": "social-scoring-pilot", "expected_tier": "prohibited", "expected_conditional": false}
+{"id": "g4", "system": "market-insights-chatbot", "expected_tier": "limited", "expected_conditional": false}
+{"id": "g5", "system": "internal-reporting-helper", "expected_tier": "minimal", "expected_conditional": false}
+{"id": "g6", "system": "undeclared-analytics", "expected_tier": "minimal", "expected_conditional": true}
+{"id": "g7", "system": "gamma-analytics-copilot", "expected_tier": "high", "expected_conditional": false, "planted": "S1234567D"}
+{"id": "g8", "system": "delta-analytics-copilot-nric-S1234567D", "expected_tier": "high", "expected_conditional": false, "planted": "S1234567D"}

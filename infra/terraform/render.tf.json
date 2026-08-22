@@ -1,0 +1,8 @@
+{
+  "locals": {
+    "render_region": "asia-southeast1",
+    "render_package_name": "conformity_pack",
+    "render_env_prefix": "CFP",
+    "render_catalog_id": "Rgc14"
+  }
+}
