@@ -146,7 +146,7 @@ already thin HTTP clients to them:
   `AuditSinkPort` and `ObservabilityTracerPort`.
 - **Hrz7** human-review / maker-checker console: every `requires_human_review` escalation is
   routed to it over the shared `review-kit` (rule R8); you wire your endpoint
-  (`HRZ_HUMAN_REVIEW_URL`), you do not re-implement the console.
+  (`HUMAN_REVIEW_URL`), you do not re-implement the console.
 
 The guardrail gateway (Hrz1) is **not** integrated today. It becomes mandatory the moment
 untrusted free text (a supplier-written system description, say) reaches the narrator: see rule

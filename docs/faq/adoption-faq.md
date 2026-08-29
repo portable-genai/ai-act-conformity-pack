@@ -37,7 +37,7 @@ Four things, and none of them is code here:
    Do not build a second one here.
 3. **The evidence feed.** `EvidencePort` harvests the artefacts sufficiency is measured against
    (Hrz4 eval reports, Hrz5 audit trails). Offline it serves fixtures.
-4. **The review console.** An Hrz7 deployment reachable at `HRZ_HUMAN_REVIEW_URL`. The managed
+4. **The review console.** An Hrz7 deployment reachable at `HUMAN_REVIEW_URL`. The managed
    router REFUSES to swallow an escalation when this is empty, so a fork cannot ship rule R8
    unwired and green.
 

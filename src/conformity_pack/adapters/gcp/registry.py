@@ -42,7 +42,7 @@ class CloudRegistryAdapter:
         url = self._settings.registry_url.strip()
         if not url:
             raise RuntimeError(
-                "registry_url is not configured; set HRZ_REGISTRY_URL "
+                "registry_url is not configured; set AGENT_REGISTRY_URL "
                 "(config/settings.yaml registry_url) to the Hrz3 registry base URL."
             )
         return url.rstrip("/")
