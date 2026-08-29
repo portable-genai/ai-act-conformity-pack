@@ -41,16 +41,16 @@ iap_audience: ${CFP_IAP_AUDIENCE:-}
 
 # Rule R8: where an escalated result is routed for human review. The managed profile REFUSES to
 # swallow an escalation when this is empty, so a producer cannot ship with R8 unwired.
-# The outbound S2S credentials are HRZ7_S2S_TOKEN / HRZ7_S2S_SIGNING_KEY (see .env.secrets.example),
+# The outbound S2S credentials are HUMAN_REVIEW_S2S_TOKEN / HUMAN_REVIEW_S2S_SIGNING_KEY (see .env.secrets.example),
 # deliberately distinct from this service's own inbound CFP_S2S_TOKEN.
-review_url: ${HRZ_HUMAN_REVIEW_URL:-}
+review_url: ${HUMAN_REVIEW_URL:-}
 
 # Managed (gcp) upstream endpoints. Each is read three-state; an empty value fails the managed
 # adapter closed (it refuses rather than guessing an endpoint) and never affects the offline
 # profile, which serves the fixture fleet. The offline gate needs none of these.
-registry_url: ${HRZ_REGISTRY_URL:-}
+registry_url: ${AGENT_REGISTRY_URL:-}
 obligations_url: ${RGC7_OBLIGATIONS_URL:-}
-evidence_url: ${HRZ_EVIDENCE_URL:-}
+evidence_url: ${EVIDENCE_URL:-}
 horizon_url: ${RSK1_HORIZON_URL:-}
 # The BigQuery "project.dataset" the managed matrix store persists applicability lineage into.
 matrix_dataset: ${CFP_MATRIX_DATASET:-}
