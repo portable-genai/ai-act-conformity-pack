@@ -471,7 +471,7 @@ class Settings:
     #: BigQuery dataset (``project.dataset``) the managed matrix store persists lineage into.
     matrix_dataset: str = ""
     #: The generation model id the managed narrator calls to phrase the conformity narrative.
-    narrator_model: str = "gemini-2.5-flash"
+    narrator_model: str = "gemini-3.5-flash"
     #: Was :attr:`profile` chosen DELIBERATELY, or merely inherited because nobody set the
     #: variable? Only :meth:`load` can set this False; direct construction names the profile in
     #: code and is deliberate by definition. The seeded-persona identity adapter refuses to
@@ -565,7 +565,7 @@ class Settings:
             evidence_url=str(data.get("evidence_url") or ""),
             horizon_url=str(data.get("horizon_url") or ""),
             matrix_dataset=str(data.get("matrix_dataset") or ""),
-            narrator_model=str(data.get("narrator_model") or "gemini-2.5-flash"),
+            narrator_model=str(data.get("narrator_model") or "gemini-3.5-flash"),
             adapters=_bindings_from(data),
         )
 

@@ -56,7 +56,7 @@ horizon_url: ${RSK1_HORIZON_URL:-}
 matrix_dataset: ${CFP_MATRIX_DATASET:-}
 # The generation model id the managed narrator phrases the conformity narrative with. The model
 # only narrates; it never produces a tier, a matrix cell or a sufficiency verdict.
-narrator_model: ${CFP_NARRATOR_MODEL:-gemini-2.5-flash}
+narrator_model: ${CFP_NARRATOR_MODEL:-gemini-3.5-flash}
 
 # The per-port adapter map: the ONLY place a binding lives, so switching the whole stack is a
 # configuration change rather than a code edit. Every port must bind every profile; the loader
