@@ -35,7 +35,7 @@ model is a bounded, replaceable component.
 | Profile | Narrator adapter | Behaviour |
 |---|---|---|
 | `local` | `adapters/local/narrator.py` | Deterministic stub: echoes the FACTS block back as a narrative with exactly the allowed figures and sources. SDK-free, no model. |
-| `gcp` | `adapters/gcp/narrator.py` | Gemini via the Google GenAI SDK, imported lazily inside the method. The model id comes from `narrator_model` in `config/settings.yaml` (`CFP_NARRATOR_MODEL`, default `gemini-2.5-flash`). |
+| `gcp` | `adapters/gcp/narrator.py` | Gemini via the Google GenAI SDK, imported lazily inside the method. The model id comes from `narrator_model` in `config/settings.yaml` (`CFP_NARRATOR_MODEL`, default `gemini-3.5-flash`). |
 | `onprem` | `adapters/onprem/narrator.py` | Fail-fast placeholder: raises, naming the client-hosted model gateway to bind. |
 
 The stub deliberately does not invent prose beyond the facts. A stub that wrote freely would be a
@@ -44,7 +44,7 @@ exercising the validation the managed path depends on.
 
 ## Remaining controls (TODO, repo owner)
 
-- **Model id, version and region** (P-07): `gemini-2.5-flash` is a default, not a pin. Confirm the
+- **Model id, version and region** (P-07): `gemini-3.5-flash` is a default, not a pin. Confirm the
   id is served in your deployment region, pin the exact model and version, and record it here.
   Gemini model ids are regional and an unavailable one fails at call time rather than at boot.
 - **Budget, rate limit and a kill switch** (P-10, P-11): there is no per-tenant token budget, no
