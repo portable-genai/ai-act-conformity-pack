@@ -7,7 +7,9 @@ from ...domain.models import ObligationRef
 
 
 class OnPremObligationsAdapter:
-    """Satisfies ObligationsPort but refuses at call time: the client wires its own Rgc7 feed."""
+    """Satisfies ObligationsPort but refuses at call time: the client wires its own
+    obligations-control-mapping feed.
+    """
 
     def __init__(self, settings: Settings) -> None:
         self._settings = settings

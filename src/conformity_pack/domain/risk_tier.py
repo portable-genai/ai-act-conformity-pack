@@ -1,9 +1,9 @@
 """The deterministic EU AI Act risk-tier engine (pure stdlib, replayable).
 
-This is the reason the classification can be put in front of a regulator: the tier is PURE CODE
-over a system's DECLARED card attributes, using set-membership rule packs (:mod:`.packs`), in
-the mechanism of Rsk1's ``HorizonPolicy.assess_applicability`` (a verdict plus explicit reasons).
-The LLM never classifies; it only narrates a decision this module has already made.
+This is the reason the classification can be put in front of a regulator: the tier is PURE CODE over
+a system's DECLARED card attributes, using set-membership rule packs (:mod:`.packs`), in the
+mechanism of compliance-advisory's ``HorizonPolicy.assess_applicability`` (a verdict plus explicit
+reasons). The LLM never classifies; it only narrates a decision this module has already made.
 
 Two invariants this module encodes:
 

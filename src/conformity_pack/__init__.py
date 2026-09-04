@@ -1,4 +1,4 @@
-"""AI Act Conformity Pack (Rgc14).
+"""AI Act Conformity Pack (ai-act-conformity-pack).
 
 Deterministic EU AI Act / FEAT risk-tier and obligation engine with a narrated conformity pack.
 

@@ -1,8 +1,8 @@
-"""Managed RegistryPort: read the AI fleet from the Hrz3 agent registry over HTTP.
+"""Managed RegistryPort: read the AI fleet from the agent-registry over HTTP.
 
-Mirrors the read half of Hrz3's ``AgentRegistryPort`` against ``/v1/agents`` (GET one, GET all)
-and parses the additive ``governance`` block into the vertical's :class:`AiSystemCard`. The base
-URL is ``registry_url`` in ``config/settings.yaml``; an empty value fails closed rather than
+Mirrors the read half of agent-registry's ``AgentRegistryPort`` against ``/v1/agents`` (GET one, GET
+all) and parses the additive ``governance`` block into the vertical's :class:`AiSystemCard`. The
+base URL is ``registry_url`` in ``config/settings.yaml``; an empty value fails closed rather than
 guessing an endpoint. No cloud SDK is imported (the registry is a sibling HTTP service), so this
 module imports cleanly offline; the network call is exercised only against a live registry.
 """
@@ -33,7 +33,7 @@ def _card_from_wire(body: dict[str, Any]) -> AiSystemCard:
 
 
 class CloudRegistryAdapter:
-    """Resolve AI-system cards from the live Hrz3 registry."""
+    """Resolve AI-system cards from the live agent-registry."""
 
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
@@ -43,7 +43,7 @@ class CloudRegistryAdapter:
         if not url:
             raise RuntimeError(
                 "registry_url is not configured; set AGENT_REGISTRY_URL "
-                "(config/settings.yaml registry_url) to the Hrz3 registry base URL."
+                "(config/settings.yaml registry_url) to the agent-registry base URL."
             )
         return url.rstrip("/")
 

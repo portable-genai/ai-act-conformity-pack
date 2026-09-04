@@ -1,12 +1,12 @@
 """The conformity assessment service: pure engines orchestrated, model narrates, R8 escalation.
 
-This is the top-level assess call. The consequential work, the risk tier, the applicability
-matrix and the evidence sufficiency, is done by the PURE engines (:mod:`.risk_tier`,
-:mod:`.applicability`, :mod:`.sufficiency`); the model only PHRASES the result, behind the
-narrator port, schema-validated and discarded on failure. Every result carries citations, PII is
-redacted BEFORE the audit write, and a consequential result (a high-risk or prohibited
-classification, an undecided cell, or a named evidence gap on a system asserting conformity) sets
-``requires_human_review`` so the surface routes it to Hrz7 under rule R8. It never auto-executes.
+This is the top-level assess call. The consequential work, the risk tier, the applicability matrix
+and the evidence sufficiency, is done by the PURE engines (:mod:`.risk_tier`, :mod:`.applicability`,
+:mod:`.sufficiency`); the model only PHRASES the result, behind the narrator port, schema-validated
+and discarded on failure. Every result carries citations, PII is redacted BEFORE the audit write,
+and a consequential result (a high-risk or prohibited classification, an undecided cell, or a named
+evidence gap on a system asserting conformity) sets ``requires_human_review`` so the surface routes
+it to human-review-console under rule R8. It never auto-executes.
 
 Determinism is the invariant: with the narrator adapter stubbed the pack's figures are identical,
 because the figures never came from the model. :meth:`assess` is replayable given the same

@@ -36,7 +36,9 @@ def main(argv: list[str] | None = None) -> int:
     # Also the partition the persisted matrix is stored under, so `--as-of` without `--tenant`
     # is refused rather than writing lineage into the partition every unscoped run shares.
     assess_cmd.add_argument(
-        "--tenant", default="", help="Tenant partition: asserted to Hrz7, and the matrix key."
+        "--tenant",
+        default="",
+        help="Tenant partition: asserted to human-review-console, and the matrix key.",
     )
     assess_cmd.add_argument("--as-of", default="", help="Replay date stamped on the matrix.")
 

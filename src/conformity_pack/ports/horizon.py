@@ -1,10 +1,12 @@
-"""HorizonPort: the Rsk1 AI-reg horizon change feed (which corpus movements to re-check).
+"""HorizonPort: the compliance-advisory AI-reg horizon change feed (which corpus movements to
+re-check).
 
-Rsk1 (incl. the ex-Rgc6 horizon scanner) emits regulatory-corpus changes. Rgc14 consumes that
-feed and, for each change, deterministically re-runs classification and applicability for the
-affected systems (:mod:`..domain.horizon_recheck`). This port names the feed read. The adapters
-translate Rsk1's ``CorpusChange`` records into the vertical's :class:`RegChange`; the domain does
-the re-check purely.
+compliance-advisory (incl. the formerly the regulatory change manager horizon scanner) emits
+regulatory-corpus changes. ai-act-conformity-pack consumes that feed and, for each change,
+deterministically re-runs classification and applicability for the affected systems
+(:mod:`..domain.horizon_recheck`). This port names the feed read. The adapters translate
+compliance-advisory's ``CorpusChange`` records into the vertical's :class:`RegChange`; the domain
+does the re-check purely.
 """
 
 from __future__ import annotations

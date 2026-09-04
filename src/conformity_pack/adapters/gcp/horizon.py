@@ -1,6 +1,6 @@
-"""Managed HorizonPort: read the Rsk1 AI-reg horizon change feed over HTTP.
+"""Managed HorizonPort: read the compliance-advisory AI-reg horizon change feed over HTTP.
 
-Reads Rsk1's ``CorpusChange`` feed and translates each record into the vertical's
+Reads compliance-advisory's ``CorpusChange`` feed and translates each record into the vertical's
 :class:`RegChange`. The base URL is ``horizon_url`` in ``config/settings.yaml``; an empty value
 fails closed. No cloud SDK import.
 """
@@ -28,7 +28,7 @@ def _change_from_wire(body: dict[str, Any]) -> RegChange:
 
 
 class CloudHorizonAdapter:
-    """Read corpus changes from the live Rsk1 horizon feed."""
+    """Read corpus changes from the live compliance-advisory horizon feed."""
 
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
@@ -38,7 +38,7 @@ class CloudHorizonAdapter:
         if not url:
             raise RuntimeError(
                 "horizon_url is not configured; set it (config/settings.yaml horizon_url) "
-                "to the Rsk1 horizon feed base URL."
+                "to the compliance-advisory horizon feed base URL."
             )
         return self._fetch(url.rstrip("/"), since)
 

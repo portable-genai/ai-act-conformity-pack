@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Evaluation gate for AI Act Conformity Pack (Rgc14).
+"""Evaluation gate for AI Act Conformity Pack (ai-act-conformity-pack).
 
 Two named layers via ``--mode`` (the scaffold is ``agent_eval_kit.eval_main``):
 
 * **smoke** (default) - the offline pre-merge check CI runs on every change: it drives the real
-  ``ConformityService`` against a golden set with SDK-free local adapters and scores three
-  metrics against the dataset's OWN labels (the independent oracle).
-* **gate** - the promotion verdict from the shared Hrz4 authority (requires the ``gcp``
-  profile), via ``agent_eval_kit.PromotionGateClient``.
+  ``ConformityService`` against a golden set with SDK-free local adapters and scores three metrics
+  against the dataset's OWN labels (the independent oracle). * **gate** - the promotion verdict from
+  the shared model-quality-gate authority (requires the ``gcp`` profile), via
+  ``agent_eval_kit.PromotionGateClient``.
 
 The consequential metrics score the deterministic engine, never the model: ``tier_accuracy`` and
 ``conditional_accuracy`` compare the pure classifier to the dataset's independently-labelled
@@ -39,7 +39,8 @@ THRESHOLDS: dict[str, float] = {
     "conditional_accuracy": 1.0,
     "pii_safety": 0.99,
 }
-#: The registered Hrz4 metric bundle for this vertical (Hrz4 owns the metrics + thresholds).
+#: The registered model-quality-gate metric bundle for this vertical (model-quality-gate owns the
+#: metrics + thresholds).
 _BUNDLE = "ai-act-conformity-pack"
 
 #: The tenant the eval run is attributed to. Obviously fictional, and named rather than empty:
@@ -168,6 +169,6 @@ if __name__ == "__main__":
             smoke=run_smoke,
             gate=run_gate,
             default_dataset=DEFAULT_DATASET,
-            description="Offline / Hrz4 evaluation gate for Rgc14.",
+            description="Offline / model-quality-gate for ai-act-conformity-pack.",
         )
     )

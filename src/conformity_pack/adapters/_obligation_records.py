@@ -1,10 +1,10 @@
 """Translate an ``obligation-register-kit`` record into the vertical's :class:`ObligationRef`.
 
-The Rgc7 seam: both the local fixture graph and the managed Rgc7 adapter speak the shared kit's
-``Obligation`` shape, and this is the ONE place that shape is turned into the vertical type the
-pure applicability engine reads. Lives in the adapter layer, not the domain, because it depends
-on the kit; the domain never imports it. Freezing this translation is what
-``tests/contract/test_obligation_kit_contract.py`` does.
+The obligations-control-mapping seam: both the local fixture graph and the managed
+obligations-control-mapping adapter speak the shared kit's ``Obligation`` shape, and this is the ONE
+place that shape is turned into the vertical type the pure applicability engine reads. Lives in the
+adapter layer, not the domain, because it depends on the kit; the domain never imports it. Freezing
+this translation is what ``tests/contract/test_obligation_kit_contract.py`` does.
 """
 
 from __future__ import annotations

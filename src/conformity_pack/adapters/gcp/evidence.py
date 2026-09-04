@@ -1,8 +1,9 @@
-"""Managed EvidencePort: harvest Hrz4 eval evidence and Hrz5 audit trails over HTTP.
+"""Managed EvidencePort: harvest model-quality-gate eval evidence and agent-observability trails
+over HTTP.
 
-Reads the platform evidence surface (Hrz4's model-card store and Hrz5's audit trails) and tags
-each artefact with the obligations it attests. The base URL is ``evidence_url`` in
-``config/settings.yaml``; an empty value fails closed. No cloud SDK import.
+Reads the platform evidence surface (model-quality-gate's model-card store and agent-observability's
+audit trails) and tags each artefact with the obligations it attests. The base URL is
+``evidence_url`` in ``config/settings.yaml``; an empty value fails closed. No cloud SDK import.
 """
 
 from __future__ import annotations

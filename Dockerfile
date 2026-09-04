@@ -1,4 +1,4 @@
-# AI Act Conformity Pack (Rgc14) serving image.
+# AI Act Conformity Pack (ai-act-conformity-pack) serving image.
 #
 # Supply-chain hardening (practices checks D1/D2/D4): the base image is DIGEST-pinned so a
 # re-pushed tag cannot change what ships, dependencies come from the committed lockfile rather

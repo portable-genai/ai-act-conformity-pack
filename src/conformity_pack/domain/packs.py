@@ -1,6 +1,7 @@
-"""Packs-as-data: the classification rule packs, looked up by name (the Hrz4 bundle mechanism).
+"""Packs-as-data: the classification rule packs, looked up by name (the model-quality-gate bundle
+mechanism).
 
-This mirrors Hrz4's ``METRIC_BUNDLES`` shape (per-bundle bars looked up by name in
+This mirrors model-quality-gate's ``METRIC_BUNDLES`` shape (per-bundle bars looked up by name in
 ``model_quality_gate/domain/thresholds.py``): the rules are DATA, not code, so a bank can
 carry its own pack in ``config/settings.yaml`` without a code edit, and the engine is the same
 for every pack.
@@ -131,7 +132,8 @@ _EU_PACK = RiskTierPack(
 )
 
 
-#: Named packs, looked up by name exactly like Hrz4's ``METRIC_BUNDLES``. A deployment selects a
+#: Named packs, looked up by name exactly like model-quality-gate's ``METRIC_BUNDLES``. A deployment
+#: selects a
 #: pack by name in ``config/settings.yaml``; an unknown name is a configuration error, not a
 #: silent fallback (:func:`risk_tier_pack`).
 RISK_TIER_PACKS: dict[str, RiskTierPack] = {

@@ -1,9 +1,9 @@
 """The deterministic evidence-sufficiency engine (pure stdlib, replayable).
 
-Given the obligations that APPLY to a system and the evidence harvested for it (Hrz4 eval
-reports, Hrz5 audit trails), this maps evidence to obligations and decides, per obligation,
-whether the required evidence kinds are present. Missing evidence is a NAMED gap, never papered
-over; the LLM is never asked to assert conformity the evidence does not support.
+Given the obligations that APPLY to a system and the evidence harvested for it (model-quality-gate
+eval reports, agent-observability trails), this maps evidence to obligations and decides, per
+obligation, whether the required evidence kinds are present. Missing evidence is a NAMED gap, never
+papered over; the LLM is never asked to assert conformity the evidence does not support.
 
 Deterministic: the same obligations and the same evidence set always produce the same verdicts.
 """

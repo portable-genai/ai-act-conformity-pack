@@ -49,7 +49,7 @@ The narrator is reachable through exactly one port (`ports/narrator.py`), it rec
 built from engine facts and grounding snippets and nothing else, and its reply is parsed and
 REJECTED unless every figure it cites is one the engine produced and every source it cites was
 retrieved (`domain/prompts.py:validate_narration`). A rejected reply is discarded, not repaired.
-Prompt-injection screening through the Hrz1 guardrail gateway is **not** wired yet, so untrusted
+Prompt-injection screening through the `agent-guardrail-gateway` is **not** wired yet, so untrusted
 free text should not be fed to the narrator until it is (rule R1 in `COMPLIANCE.md`).
 
 ### How is the audit trail protected?
@@ -77,8 +77,7 @@ a regular expression cannot tell apart.
 
 - **Login.** This repo authenticates nobody itself: the platform in front of it does, and the UI
   forwards the assertion without parsing or trusting a parsed copy.
-- **Injection defence and output filtering.** Owned by Hrz1; not bound yet.
-- **The review queue.** Owned by Hrz7; this repo produces escalations and routes them.
+- **Injection defence and output filtering.** Owned by `agent-guardrail-gateway`; not bound yet.
+- **The review queue.** Owned by `human-review-console`; this repo produces escalations and routes them.
 - **Network egress control.** VPC-SC governs access to Google APIs across perimeters, not
-  arbitrary internet egress. The private-egress rule that lets this service reach the Hrz7
-  console and nothing else is an adopter network decision, called out in `COMPLIANCE.md` P-01.
+  arbitrary internet egress. The private-egress rule that lets this service reach the `human-review-console` and nothing else is an adopter network decision, called out in `COMPLIANCE.md` P-01.

@@ -12,7 +12,7 @@ steps and one narrated one:
    named rule pack yields an EU AI Act tier plus per-framework dimensions (FEAT, HKMA, APRA,
    JFSA), each with explicit reasons.
 2. **Applicability** (`domain/applicability.py`): for every (system, obligation) pair over the
-   Rgc7 obligation graph, APPLIES, NOT_APPLICABLE or CONDITIONAL, worst-wins across
+   `obligations-control-mapping` obligation graph, APPLIES, NOT_APPLICABLE or CONDITIONAL, worst-wins across
    jurisdictions.
 3. **Sufficiency** (`domain/sufficiency.py`): for each applying obligation, whether the harvested
    evidence covers the kinds that obligation requires. Missing evidence becomes a NAMED gap.
@@ -39,7 +39,7 @@ instead. With the local stub narrator bound, the pack's figures are byte-identic
 - **It will not resolve an ambiguous scope downward.** The tier evaluation runs strongest first,
   so a scope that reads two ways takes the stronger tier.
 - **It will not auto-execute a consequential result.** A consequential pack sets
-  `requires_human_review` and is ROUTED to the Hrz7 console in the same call that produced it
+  `requires_human_review` and is ROUTED to the `human-review-console` in the same call that produced it
   (rule R8), on every surface.
 - **It will not answer without provenance.** Every claim carries a `Citation`.
 
@@ -55,14 +55,14 @@ routes escalations in the same call, so rule R8 does not hold on four surfaces o
 
 | Concern | Owner | How this repo touches it |
 |---|---|---|
-| The obligation, policy and control graph | **Rgc7** obligations and control mapping | read over `ObligationsPort` (`RGC7_OBLIGATIONS_URL`). This repo decides applicability; it does not keep a register. |
-| The regulatory corpus and the change horizon | **Rsk1** compliance assistant | read over `RetrievalPort` and `HorizonPort` (`RSK1_HORIZON_URL`); a `RegChange` drives the re-check. |
-| Agent discovery and entitlements | **Hrz3** agent registry | this agent publishes a card; the registry owns discovery. |
-| Model and agent promotion | **Hrz4** AI quality and model risk | `eval/run_eval.py --mode gate` asks Hrz4; the offline smoke mode never promotes. |
-| Traces and the immutable audit sink | **Hrz5** agent observability | `AuditSinkPort` and `ObservabilityTracerPort`. |
-| Human review and maker-checker | **Hrz7** human review console | `ReviewRouterPort` over the shared `review-kit`. This repo produces escalations; it does not render a queue. |
-| Prompt-injection defence and output filtering | **Hrz1** agent guardrail gateway | **not wired today.** It becomes mandatory the moment untrusted free text reaches the narrator (rule R1). |
-| Grounded retrieval over an enterprise corpus | **Hrz2** enterprise knowledge base | not wired today; `RetrievalPort` serves the local corpus offline. |
+| The obligation, policy and control graph | `obligations-control-mapping` and control mapping | read over `ObligationsPort` (`RGC7_OBLIGATIONS_URL`). This repo decides applicability; it does not keep a register. |
+| The regulatory corpus and the change horizon | `compliance-advisory` | read over `RetrievalPort` and `HorizonPort` (`RSK1_HORIZON_URL`); a `RegChange` drives the re-check. |
+| Agent discovery and entitlements | `agent-registry` | this agent publishes a card; the registry owns discovery. |
+| Model and agent promotion | `model-quality-gate` AI quality and model risk | `eval/run_eval.py --mode gate` asks `model-quality-gate`; the offline smoke mode never promotes. |
+| Traces and the immutable audit sink | `agent-observability` agent observability | `AuditSinkPort` and `ObservabilityTracerPort`. |
+| Human review and maker-checker | `human-review-console` human review console | `ReviewRouterPort` over the shared `review-kit`. This repo produces escalations; it does not render a queue. |
+| Prompt-injection defence and output filtering | `agent-guardrail-gateway` agent guardrail gateway | **not wired today.** It becomes mandatory the moment untrusted free text reaches the narrator (rule R1). |
+| Grounded retrieval over an enterprise corpus | `enterprise-knowledge-base` | not wired today; `RetrievalPort` serves the local corpus offline. |
 
 ### Can I demo it without a cloud project?
 
@@ -76,5 +76,5 @@ narrated claim, so a claim that stops being true fails a build rather than a mee
 
 The honest list is [`../practices-audit.md`](../practices-audit.md) and the `TODO (repo owner)`
 rows in [`../../COMPLIANCE.md`](../../COMPLIANCE.md). The two that matter most for a production
-decision: the Hrz1 guardrail binding (needed before untrusted text reaches the narrator), and
-registering this repo's metric bundle with Hrz4 so `--mode gate` has an authority to ask.
+decision: the `agent-guardrail-gateway` binding (needed before untrusted text reaches the narrator), and
+registering this repo's metric bundle with `model-quality-gate` so `--mode gate` has an authority to ask.

@@ -1,4 +1,4 @@
-# Model card: AI Act Conformity Pack (Rgc14)
+# Model card: AI Act Conformity Pack (`ai-act-conformity-pack`)
 
 This is a STARTER model card. It records the model boundary as built and the controls that must
 be completed before a managed deployment. The deterministic engines are the system of record; the
@@ -27,7 +27,7 @@ model is a bounded, replaceable component.
 - Personal data is masked before the audit write, before a review payload leaves the process, and
   before a tool result can enter a model's context (`domain/pii.py`, `agent/tools.py`,
   `adapters/_review_payload.py`).
-- Every consequential result sets `requires_human_review` and is routed to Hrz7 (rule R8) in the
+- Every consequential result sets `requires_human_review` and is routed to `human-review-console` (rule R8) in the
   same call; nothing auto-executes.
 
 ## Adapters and profiles
@@ -52,10 +52,10 @@ exercising the validation the managed path depends on.
   exists (a rejected reply already yields the deterministic narrative), but nothing yet lets an
   operator disable the model deliberately.
 - **Evaluation of the live model**: the offline eval scores the deterministic pipeline with the
-  stub narrator against the golden cases. Add a managed-profile run, registered with the Hrz4
+  stub narrator against the golden cases. Add a managed-profile run, registered with the `model-quality-gate`
   promotion gate (P-08, rule R5), that scores narrative groundedness against the same golden
   cases with the real model bound.
-- **Prompt-injection screening** (rule R1): the Hrz1 guardrail gateway is not bound. Screen any
+- **Prompt-injection screening** (rule R1): the `agent-guardrail-gateway` is not bound. Screen any
   untrusted free text (a supplier-written system description, an uploaded evidence summary)
   before it reaches `build_prompt`, and fail closed to deterministic-only when the screen is
   unavailable.

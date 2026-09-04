@@ -1,6 +1,6 @@
 # Adopting this repo as your base
 
-This repository (Rgc14, the AI Act Conformity Pack) is a **common base** that a bank or other
+This repository (`ai-act-conformity-pack`, the AI Act Conformity Pack) is a **common base** that a bank or other
 regulated institution forks to build its own **AI-system conformity engine**: a service that
 classifies a registered AI system into a risk tier from its declared card, decides which
 obligations bind it cell by cell, checks whether the harvested evidence is sufficient, and emits
@@ -24,17 +24,17 @@ This guide is the step-by-step for making it yours. It has two halves: a **mecha
 The core is hexagonal, and the boundary between reusable machinery and the conformity vertical is
 a physical module split with an enforced dependency direction (practices-audit check A7).
 `domain/kernel.py` owns the vertical-neutral contracts and imports nothing from the vertical, so
-you can import it without loading a line of AI Act logic; `domain/models.py` holds only the Rgc14
+you can import it without loading a line of AI Act logic; `domain/models.py` holds only the `ai-act-conformity-pack`
 artifacts and re-exports every kernel name.
 
 | Layer | Where | For a new framework set |
 |---|---|---|
 | **Vertical-neutral machinery** | `domain/kernel.py` (`Citation`, `AuditEvent`, `Severity`, `Decision`, `utcnow`), `domain/errors.py`, every Protocol in `ports/`, the container wiring in `config.py` | keep untouched |
 | **Policy (your numbers and sets)** | the rule packs in `domain/packs.py` (`RISK_TIER_PACKS`, the framework scope sets), the jurisdiction list in `domain/pii.py`, the metric thresholds in `eval/run_eval.py` | change deliberately (see section 4) |
-| **Vertical (the artifacts themselves)** | the Rgc14 models in `domain/models.py` (`AiSystemCard`, `TierVerdict`, `ApplicabilityCell`, `SufficiencyVerdict`, `ConformityResult`), the four engines (`risk_tier.py`, `applicability.py`, `sufficiency.py`, `horizon_recheck.py`), `domain/prompts.py`, the local fixtures and the eval golden set | rewrite for your framework |
+| **Vertical (the artifacts themselves)** | the `ai-act-conformity-pack` models in `domain/models.py` (`AiSystemCard`, `TierVerdict`, `ApplicabilityCell`, `SufficiencyVerdict`, `ConformityResult`), the four engines (`risk_tier.py`, `applicability.py`, `sufficiency.py`, `horizon_recheck.py`), `domain/prompts.py`, the local fixtures and the eval golden set | rewrite for your framework |
 
 If your product is another *classification plus obligation-mapping* gate, most of the hexagon,
-the three profiles, the deterministic-verdict pattern, the eval gate and the Hrz7 review routing
+the three profiles, the deterministic-verdict pattern, the eval gate and the `human-review-console` review routing
 transfer directly; you replace the rule packs and the obligation source, and retune the policy
 sets and the taxonomy.
 
@@ -79,7 +79,7 @@ make gate
 `--dist` defaults to the `--resource` value; pass it explicitly when your git id differs from
 your resource stem. `--resource` is validated against the same regex the Terraform
 `name_prefix` variable enforces, so a stem the stack would refuse fails here instead of at plan
-time. Add `--include-docs` to sweep Markdown prose too. The catalog id `Rgc14` is left alone
+time. Add `--include-docs` to sweep Markdown prose too. The catalog id `ai-act-conformity-pack` is left alone
 unless you pass `--catalog-id`, so a fork stays traceable to the entry it descends from. The
 script deliberately does NOT touch the human decisions below.
 
@@ -102,8 +102,8 @@ script deliberately does NOT touch the human decisions below.
    keep the two invariants the engine encodes: an under-declared card tiers CONDITIONAL rather
    than MINIMAL, and an ambiguous scope takes the stronger tier.
 4. **The obligation source.** The applicability engine reads the obligation graph over
-   `ObligationsPort`. Offline it serves fixtures; under `gcp` it reads Rgc7 at
-   `RGC7_OBLIGATIONS_URL`. Point it at your own obligation register, or keep Rgc7 and load your
+   `ObligationsPort`. Offline it serves fixtures; under `gcp` it reads `obligations-control-mapping` at
+   `RGC7_OBLIGATIONS_URL`. Point it at your own obligation register, or keep `obligations-control-mapping` and load your
    obligations into it, but do not build a second register here.
 5. **Policy numbers your compliance function owns.** The jurisdiction list in `domain/pii.py`
    (which national PII rows are scanned, and in what order), the `required_evidence` kinds each
@@ -131,24 +131,24 @@ owned by sibling platform services, and you should integrate rather than rebuild
 [`faq/features-faq.md`](faq/features-faq.md) for the full map). The `gcp` profile's adapters are
 already thin HTTP clients to them:
 
-- **Rgc7** obligations and control mapping: the obligation graph the applicability engine reads,
+- `obligations-control-mapping` and control mapping: the obligation graph the applicability engine reads,
   via `ObligationsPort` (`RGC7_OBLIGATIONS_URL`). This repo decides applicability; it does not
   own the register.
-- **Rsk1** compliance assistant: the regulatory corpus and the horizon feed, via `RetrievalPort`
+- `compliance-advisory`: the regulatory corpus and the horizon feed, via `RetrievalPort`
   and `HorizonPort` (`RSK1_HORIZON_URL`). A corpus change arrives as a `RegChange` and
   `domain/horizon_recheck.py` decides which systems it reopens.
-- **Hrz3** agent registry: this agent publishes its A2A card at
+- `agent-registry`: this agent publishes its A2A card at
   `/.well-known/agent-card.json`; register it rather than inventing a discovery mechanism.
-- **Hrz4** AI-quality / model-risk gate: owns promotion. `eval/run_eval.py --mode gate` is the
+- `model-quality-gate` AI-quality / model-risk gate: owns promotion. `eval/run_eval.py --mode gate` is the
   client half and refuses to run off the managed profile; the offline smoke mode mirrors the
   thresholds.
-- **Hrz5** observability plus immutable WORM audit: audit events and trace spans go to it via
+- `agent-observability` plus immutable WORM audit: audit events and trace spans go to it via
   `AuditSinkPort` and `ObservabilityTracerPort`.
-- **Hrz7** human-review / maker-checker console: every `requires_human_review` escalation is
+- `human-review-console` human-review / maker-checker console: every `requires_human_review` escalation is
   routed to it over the shared `review-kit` (rule R8); you wire your endpoint
   (`HUMAN_REVIEW_URL`), you do not re-implement the console.
 
-The guardrail gateway (Hrz1) is **not** integrated today. It becomes mandatory the moment
+The guardrail gateway (`agent-guardrail-gateway`) is **not** integrated today. It becomes mandatory the moment
 untrusted free text (a supplier-written system description, say) reaches the narrator: see rule
 R1 in [`../COMPLIANCE.md`](../COMPLIANCE.md).
 
@@ -160,13 +160,13 @@ R1 in [`../COMPLIANCE.md`](../COMPLIANCE.md).
 - [ ] Wired your IdP audience on the deployed service (this repo owns no login flow).
 - [ ] Replaced the rule packs in `domain/packs.py` with your framework, keeping the
       CONDITIONAL-not-MINIMAL and stronger-tier-wins invariants.
-- [ ] Pointed `ObligationsPort` at your obligation register (or loaded yours into Rgc7).
+- [ ] Pointed `ObligationsPort` at your obligation register (or loaded yours into `obligations-control-mapping`).
 - [ ] Owned the policy numbers (PII jurisdictions, required evidence kinds, eval thresholds) with
       your compliance function.
 - [ ] Replaced every synthetic fixture and the local obligation corpus.
 - [ ] Rebuilt the eval golden set for your framework.
 - [ ] Reviewed the deploy posture (Dockerfile, Terraform, `retention_days`, bind address).
-- [ ] Wired your Hrz7 review endpoint and decided which sibling services you integrate vs stub.
+- [ ] Wired your `human-review-console` review endpoint and decided which sibling services you integrate vs stub.
 - [ ] Read [`model-card.md`](model-card.md) and closed its remaining controls before enabling the
       managed narrator.
 - [ ] Recorded your baseline upstream tag so you can take future fixes.

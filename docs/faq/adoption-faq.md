@@ -11,7 +11,7 @@ script), the `CFP_` env prefix (including the bare token that
 `infra/terraform/render.tf.json` carries, so Terraform sets the same variable names on the
 service), the Terraform `name_prefix` resource stem (`rgc14-svc`) and the distribution / git id
 in one pass. Preview with `--dry-run`, apply with `--yes`, then recreate the venv,
-`make install`, and run `make gate`. The catalog id `Rgc14` is left alone unless you pass
+`make install`, and run `make gate`. The catalog id `ai-act-conformity-pack` is left alone unless you pass
 `--catalog-id`, so a fork stays traceable to the entry it descends from. The script does the
 mechanical rename; the human decisions (rule packs, region, IdP, obligation source, eval golden
 set) are the checklist in `ADOPTING.md`.
@@ -33,11 +33,11 @@ Four things, and none of them is code here:
    vocabulary is illustrative, not a legal enumeration; your compliance function owns the real
    one.
 2. **The obligation register.** The applicability engine reads it over `ObligationsPort`. Point
-   it at Rgc7 (`RGC7_OBLIGATIONS_URL`) with your obligations loaded, or at your own register.
+   it at `obligations-control-mapping` (`RGC7_OBLIGATIONS_URL`) with your obligations loaded, or at your own register.
    Do not build a second one here.
 3. **The evidence feed.** `EvidencePort` harvests the artefacts sufficiency is measured against
-   (Hrz4 eval reports, Hrz5 audit trails). Offline it serves fixtures.
-4. **The review console.** An Hrz7 deployment reachable at `HUMAN_REVIEW_URL`. The managed
+   (`model-quality-gate` eval reports, `agent-observability` trails). Offline it serves fixtures.
+4. **The review console.** An `human-review-console` deployment reachable at `HUMAN_REVIEW_URL`. The managed
    router REFUSES to swallow an escalation when this is empty, so a fork cannot ship rule R8
    unwired and green.
 
@@ -88,7 +88,7 @@ is adoption step 7.
 ### What is still open?
 
 [`../practices-audit.md`](../practices-audit.md) carries the per-check verdict and the work list.
-The two that matter most before production: binding the Hrz1 guardrail gateway (needed before
-untrusted free text reaches the narrator), and registering this repo's metric bundle with Hrz4 so
+The two that matter most before production: binding the `agent-guardrail-gateway` (needed before
+untrusted free text reaches the narrator), and registering this repo's metric bundle with `model-quality-gate` so
 `eval/run_eval.py --mode gate` has an authority to ask. The Terraform stack is written, validated
 and tested against a mocked provider; it has never been applied.

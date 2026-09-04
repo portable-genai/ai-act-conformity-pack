@@ -13,8 +13,8 @@ audience; skim the one that matches your role.
 | [compliance-faq.md](compliance-faq.md) | Compliance / model risk / second line | regulatory posture, maker-checker, residency, retention, model-risk evidence |
 
 These FAQs deliberately do **not** re-document capabilities owned by sibling systems in the GRC
-catalog. Where a concern belongs to another repo (the obligation register Rgc7, the regulatory
-corpus Rsk1, the guardrail gateway Hrz1, the human-review console Hrz7, the eval platform Hrz4),
+catalog. Where a concern belongs to another repo (the obligation register `obligations-control-mapping`, the regulatory
+corpus `compliance-advisory`, the guardrail gateway `agent-guardrail-gateway`, the human-review console `human-review-console`, the eval platform `model-quality-gate`),
 the FAQ points at it and explains the boundary rather than duplicating it. See
 [features-faq.md](features-faq.md) for the full "what this repo owns vs what it integrates" map.
 
