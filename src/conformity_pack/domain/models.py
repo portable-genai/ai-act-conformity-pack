@@ -60,7 +60,7 @@ def severity_for_tier(tier: RiskTier) -> Severity:
 
 
 class Applicability(LenientStrEnum):
-    """Whether an obligation applies to a system, over the Rgc7 obligations graph."""
+    """Whether an obligation applies to a system, over the obligations-control-mapping graph."""
 
     APPLIES = "applies"  # the framework, jurisdiction and tier all match: the obligation binds
     NOT_APPLICABLE = "not_applicable"  # a declared attribute rules it out
@@ -77,7 +77,7 @@ class Sufficiency(LenientStrEnum):
 
 @dataclass(frozen=True, slots=True)
 class AiSystemCard:
-    """A deployed AI/agent system as read from the Hrz3 registry's ``governance`` block.
+    """A deployed AI/agent system as read from the agent-registry's ``governance`` block.
 
     ``scopes`` are the declared use scopes that drive AI-Act classification; ``attributes`` is a
     sorted key/value tuple carrying the additional declared facts the engines read (jurisdiction,
@@ -143,7 +143,8 @@ class TierVerdict:
 
 @dataclass(frozen=True, slots=True)
 class ObligationRef:
-    """A thin reference to one obligation over the Rgc7 graph, with its classifying attributes.
+    """A thin reference to one obligation over the obligations-control-mapping graph, with its
+    classifying attributes.
 
     The attributes the applicability engine reads: ``framework`` (which regime), ``min_tier``
     (the weakest system tier the obligation binds at), ``jurisdiction`` (or ``""`` for global),
@@ -174,7 +175,9 @@ class ApplicabilityCell:
 
 @dataclass(frozen=True, slots=True)
 class EvidenceItem:
-    """One harvested evidence artefact (an Hrz4 eval report, an Hrz5 audit trail, and so on)."""
+    """One harvested evidence artefact (an model-quality-gate eval report, an agent-observability
+    trail, and so on).
+    """
 
     id: str
     kind: str
@@ -196,9 +199,11 @@ class SufficiencyVerdict:
 
 @dataclass(frozen=True, slots=True)
 class RegChange:
-    """One regulatory-corpus movement from the Rsk1 horizon feed that may reopen a verdict.
+    """One regulatory-corpus movement from the compliance-advisory horizon feed that may reopen a
+    verdict.
 
-    A deliberately small mirror of Rsk1's ``CorpusChange``: the fields this system re-runs
+    A deliberately small mirror of compliance-advisory's ``CorpusChange``: the fields this system
+    re-runs
     classification and applicability on. ``frameworks`` and ``scopes`` name what the change
     touches, so only the affected systems and cells are recomputed.
     """

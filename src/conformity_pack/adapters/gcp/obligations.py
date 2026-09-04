@@ -1,11 +1,11 @@
-"""Managed ObligationsPort: read the Rgc7 obligations graph over HTTP.
+"""Managed ObligationsPort: read the obligations-control-mapping graph over HTTP.
 
-Reads the Rgc7 (``obligations-control-mapping``) feed, parses each row into an
-``obligation-register-kit`` ``Obligation`` (the shared wire shape), and translates it into the
+Reads the obligations-control-mapping (``obligations-control-mapping``) feed, parses each row into
+an ``obligation-register-kit`` ``Obligation`` (the shared wire shape), and translates it into the
 vertical's :class:`ObligationRef` through the same :func:`obligation_to_ref` the local fixture
 adapter uses, so both families produce identical vertical records. The base URL is
 ``obligations_url`` in ``config/settings.yaml``; an empty value fails closed. No cloud SDK import;
-the network call runs only against a live Rgc7 service.
+the network call runs only against a live obligations-control-mapping service.
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ def _kit_from_wire(body: dict[str, Any]) -> KitObligation:
 
 
 class CloudObligationsAdapter:
-    """Read obligations from the live Rgc7 service."""
+    """Read obligations from the live obligations-control-mapping service."""
 
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
@@ -44,7 +44,7 @@ class CloudObligationsAdapter:
         if not url:
             raise RuntimeError(
                 "obligations_url is not configured; set it (config/settings.yaml "
-                "obligations_url) to the Rgc7 obligations service base URL."
+                "obligations_url) to the obligations-control-mapping service base URL."
             )
         return self._fetch(url.rstrip("/"))
 

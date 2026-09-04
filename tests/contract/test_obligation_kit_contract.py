@@ -1,10 +1,11 @@
-"""Freeze the Rgc7 seam: the ``obligation-register-kit`` record shape this repo consumes.
+"""Freeze the obligations-control-mapping seam: the ``obligation-register-kit`` record shape this
+repo consumes.
 
-Rgc14 does not own obligations; it reads them from Rgc7, typed by the shared kit. This suite
-freezes the ONE translation from a kit ``Obligation`` into the vertical ``ObligationRef`` so a
-kit release that changed a field name or an attribute key fails here rather than silently
-mis-classifying applicability. It is a contract fixture test, exactly as the build rules require
-for a consumed-but-unbuilt dependency's shape.
+ai-act-conformity-pack does not own obligations; it reads them from obligations-control-mapping,
+typed by the shared kit. This suite freezes the ONE translation from a kit ``Obligation`` into the
+vertical ``ObligationRef`` so a kit release that changed a field name or an attribute key fails here
+rather than silently mis-classifying applicability. It is a contract fixture test, exactly as the
+build rules require for a consumed-but-unbuilt dependency's shape.
 """
 
 from __future__ import annotations

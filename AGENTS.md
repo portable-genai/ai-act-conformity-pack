@@ -7,7 +7,7 @@ here. Read it first. This file carries only what is specific to this one.
 
 ## What this is
 
-AI Act Conformity Pack (Rgc14): Deterministic EU AI Act / FEAT risk-tier and obligation engine with a narrated conformity pack.
+AI Act Conformity Pack (`ai-act-conformity-pack`): Deterministic EU AI Act / FEAT risk-tier and obligation engine with a narrated conformity pack.
 Rendered from `hex-service-template`, so it starts at reference parity rather than converging
 toward it. Package `conformity_pack`, environment prefix
 `CFP`, region `asia-southeast1`.

@@ -1,9 +1,10 @@
 """The synthetic AI fleet the offline profile governs: cards, obligations, evidence, KB, feed.
 
 One home for the fixture data every ``local`` adapter serves, so the registry, obligations,
-evidence, retrieval and horizon adapters all agree on one fleet. Obviously fictional: every
-system, owner and party is invented and every domain is ``.example``. This is the self-governing
-demo fleet, so Mrm1's own registered card is included (the wave's second repo governs the first).
+evidence, retrieval and horizon adapters all agree on one fleet. Obviously fictional: every system,
+owner and party is invented and every domain is ``.example``. This is the self-governing demo fleet,
+so model-risk-validation's own registered card is included (the wave's second repo governs the
+first).
 
 The data is deliberately shaped so the deterministic engines produce a spread of outcomes: a
 prohibited practice, high-risk credit and HR systems, a limited-risk chatbot, a minimal internal
@@ -89,13 +90,14 @@ FLEET: tuple[AiSystemCard, ...] = (
         lifecycle="draft",
         description="An analytics system whose use scopes were never declared on the card.",
     ),
-    # Mrm1's own registered card, so this pack governs the wave's first repo (slice 8).
+    # model-risk-validation's own registered card, so this pack governs the wave's first repo (slice
+    # 8).
     _card(
         "model-risk-validation",
         ("creditworthiness-assessment", "aml-transaction-monitoring"),
         "SG",
         owner="model-risk@bank.example",
-        description="Mrm1: quantitative model-risk validation copilot.",
+        description="model-risk-validation: quantitative model-risk validation copilot.",
     ),
     # A card whose free-text description carries a planted identifier, for the redaction proofs.
     # The description flows into the card's citation snippet, so redact-before-audit must mask it.
@@ -128,10 +130,12 @@ def _obl(
     jurisdiction: str,
     required: tuple[str, ...],
 ) -> KitObligation:
-    """One fixture obligation as an ``obligation-register-kit`` record (the Rgc7 wire shape).
+    """One fixture obligation as an ``obligation-register-kit`` record (the
+    obligations-control-mapping wire shape).
 
     The classifying facts the applicability engine reads travel in the kit record's
-    ``attributes`` tuple, exactly as a real Rgc7 feed carries them; the local adapter translates
+    ``attributes`` tuple, exactly as a real obligations-control-mapping feed carries them; the local
+    adapter translates
     the kit record into a vertical :class:`ObligationRef` through the shared
     :func:`obligation_to_ref`, so the domain never depends on the kit.
     """
@@ -149,7 +153,7 @@ def _obl(
     )
 
 
-#: The Rgc7 obligations graph fixture, as kit records spanning frameworks and tiers.
+#: The obligations-control-mapping graph fixture, as kit records spanning frameworks and tiers.
 KIT_OBLIGATIONS: tuple[KitObligation, ...] = (
     _obl(
         "eu-art9",
@@ -243,8 +247,15 @@ def _evidence(
 #: engine surfaces named gaps (a missing technical-documentation, a missing oversight procedure).
 EVIDENCE: dict[str, tuple[EvidenceItem, ...]] = {
     "credit-decision-copilot": (
-        _evidence("cdc-eval", "eval-report", ("eu-art9",), "Hrz4 eval run: passed the bundle."),
-        _evidence("cdc-audit", "audit-trail", ("eu-art14", "hkma-consumer"), "Hrz5 audit trail."),
+        _evidence(
+            "cdc-eval",
+            "eval-report",
+            ("eu-art9",),
+            "model-quality-gate eval run: passed the bundle.",
+        ),
+        _evidence(
+            "cdc-audit", "audit-trail", ("eu-art14", "hkma-consumer"), "agent-observability trail."
+        ),
         _evidence(
             "cdc-fair", "fairness-assessment", ("feat-fairness",), "MAS FEAT fairness review."
         ),
@@ -256,9 +267,9 @@ EVIDENCE: dict[str, tuple[EvidenceItem, ...]] = {
         # art9 and art14 have no evidence at all: INSUFFICIENT.
     ),
     "model-risk-validation": (
-        _evidence("mrm-eval", "eval-report", ("eu-art9",), "Hrz4 eval evidence."),
+        _evidence("mrm-eval", "eval-report", ("eu-art9",), "model-quality-gate eval evidence."),
         _evidence("mrm-risk", "risk-assessment", ("eu-art9",), "Validation risk assessment."),
-        _evidence("mrm-audit", "audit-trail", ("eu-art14",), "Hrz5 audit trail."),
+        _evidence("mrm-audit", "audit-trail", ("eu-art14",), "agent-observability trail."),
         _evidence("mrm-ovr", "oversight-procedure", ("eu-art14",), "Human oversight SOP."),
         _evidence("mrm-doc", "technical-documentation", ("eu-art11",), "Technical documentation."),
         _evidence("mrm-fair", "fairness-assessment", ("feat-fairness",), "FEAT fairness review."),
@@ -322,7 +333,8 @@ def knowledge_base(query: str) -> tuple[Citation, ...]:
     return tuple(citation for token, citation in _KB if token in lowered)
 
 
-#: The Rsk1 horizon change feed fixture (ex-Rgc6 corpus movements).
+#: The compliance-advisory horizon change feed fixture (formerly the regulatory change manager
+#: corpus movements).
 CHANGES: tuple[RegChange, ...] = (
     RegChange(
         id="chg-2026-eu-credit",

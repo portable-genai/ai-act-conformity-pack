@@ -220,7 +220,7 @@ CANONICAL_CALLS: dict[str, PortCase] = {
         invoke=_obligations_invoke,
         answered=_obligations_answered,
         managed_refusal=(RuntimeError,),
-        detail="read the Rgc7 obligations graph",
+        detail="read the obligations-control-mapping graph",
     ),
     "evidence": PortCase(
         invoke=_evidence_invoke,
@@ -269,7 +269,7 @@ CANONICAL_CALLS: dict[str, PortCase] = {
     "evaluation": PortCase(
         invoke=_evaluation_invoke,
         answered=_evaluation_answered,
-        # The managed gate reaches Hrz4 over HTTP, which is unreachable offline.
+        # The managed gate reaches model-quality-gate over HTTP, which is unreachable offline.
         managed_refusal=(Exception,),
         detail="score one golden dataset through the promotion authority",
     ),

@@ -1,6 +1,8 @@
-"""ObligationsPort: the read seam onto the Rgc7 obligations graph (the Rgc7 seam).
+"""ObligationsPort: the read seam onto the obligations-control-mapping graph (the
+obligations-control-mapping seam).
 
-Rgc14 evaluates applicability OVER the shared obligations graph (``rgc-obligations-control-
+ai-act-conformity-pack evaluates applicability OVER the shared obligations graph
+(``rgc-obligations-control-
 mapping``); it does not own the obligations. This port names that read. The adapters pin
 ``obligation-register-kit`` by tag for the record shapes and translate a kit ``Obligation`` into
 the vertical's :class:`ObligationRef` (framework, minimum tier, jurisdiction, required evidence
@@ -17,5 +19,7 @@ from ..domain.models import ObligationRef
 @runtime_checkable
 class ObligationsPort(Protocol):
     def obligations(self) -> tuple[ObligationRef, ...]:
-        """Every obligation in the Rgc7 graph, as vertical :class:`ObligationRef` records."""
+        """Every obligation in the obligations-control-mapping graph, as vertical
+        :class:`ObligationRef` records.
+        """
         ...

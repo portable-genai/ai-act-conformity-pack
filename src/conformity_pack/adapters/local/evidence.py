@@ -1,4 +1,5 @@
-"""Local EvidencePort: the fixture Hrz4/Hrz5 evidence, harvested per system (SDK-free offline).
+"""Local EvidencePort: the fixture model-quality-gate, agent-observability evidence, harvested per
+system (SDK-free offline).
 
 Serves the synthetic harvested evidence from :mod:`.fleet_fixtures`. Deliberately incomplete for
 some systems so the sufficiency engine surfaces the same named gaps the managed adapter would

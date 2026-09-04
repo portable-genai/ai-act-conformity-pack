@@ -1,4 +1,4 @@
-"""FastAPI application for AI Act Conformity Pack (Rgc14).
+"""FastAPI application for AI Act Conformity Pack (ai-act-conformity-pack).
 
 Import-safe (the Container is built at request time, never at import; only ``Settings`` is read
 at import, to learn which identity adapter is bound, and no adapter is constructed), identity is
@@ -296,7 +296,7 @@ def assess(
     """Assess one AI system for conformity; the actor and tenant are the principal, not the body.
 
     Rule R8: a result that sets ``requires_human_review`` (a high-risk or prohibited tier, an
-    undecided cell, or a named evidence gap) is ROUTED to the Hrz7 console here, in the same
+    undecided cell, or a named evidence gap) is ROUTED to the human-review-console here, in the same
     request that produced it. Setting the flag is not the escalation; routing is. The maker is
     the verified principal, so the console records who originated the decision.
 

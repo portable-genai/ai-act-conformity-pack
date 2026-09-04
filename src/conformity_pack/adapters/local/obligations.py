@@ -1,4 +1,4 @@
-"""Local ObligationsPort: the fixture Rgc7 obligations graph (SDK-free offline).
+"""Local ObligationsPort: the fixture obligations-control-mapping graph (SDK-free offline).
 
 Serves the synthetic obligations graph from :mod:`.fleet_fixtures` as vertical
 :class:`ObligationRef` records, the same shape the managed adapter produces by translating an

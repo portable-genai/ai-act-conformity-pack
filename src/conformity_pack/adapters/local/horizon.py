@@ -1,4 +1,4 @@
-"""Local HorizonPort: the fixture Rsk1 horizon change feed (SDK-free offline).
+"""Local HorizonPort: the fixture compliance-advisory horizon change feed (SDK-free offline).
 
 Serves the synthetic corpus-change feed from :mod:`.fleet_fixtures`. The ``since`` filter is a
 plain ISO-date string compare on the change id's embedded year segment; for the fixture feed it

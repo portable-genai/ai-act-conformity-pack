@@ -1,10 +1,10 @@
 """The AI-reg horizon re-check (pure stdlib): which systems a corpus change reopens.
 
-Rsk1's horizon feed emits ``CorpusChange`` records when the regulatory corpus moves. This module
-answers the deterministic question those records raise for the conformity fleet: WHICH systems'
-classification and applicability a given change reopens, and only those. A change that touches a
-framework a system is not subject to, and touches no scope the system declares, does not affect
-it, so recomputing it would be noise.
+compliance-advisory's horizon feed emits ``CorpusChange`` records when the regulatory corpus moves.
+This module answers the deterministic question those records raise for the conformity fleet: WHICH
+systems' classification and applicability a given change reopens, and only those. A change that
+touches a framework a system is not subject to, and touches no scope the system declares, does not
+affect it, so recomputing it would be noise.
 
 The re-check is intentionally a pure predicate over declared facts: a replayed change flips
 exactly the affected systems and no others, which is the property the eval proves.

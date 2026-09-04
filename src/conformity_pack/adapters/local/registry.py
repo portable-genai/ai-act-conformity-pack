@@ -1,8 +1,9 @@
-"""Local RegistryPort: the fixture AI fleet, served with no live Hrz3 (SDK-free offline).
+"""Local RegistryPort: the fixture AI fleet, served with no live agent-registry (SDK-free offline).
 
 Serves the synthetic self-governing fleet from :mod:`.fleet_fixtures`, so the offline gate, the
 tests and the demo classify a real fleet without a running registry. Not a no-op: it returns the
-same :class:`AiSystemCard`s the managed adapter would parse from Hrz3's ``governance`` block.
+same :class:`AiSystemCard`s the managed adapter would parse from agent-registry's ``governance``
+block.
 """
 
 from __future__ import annotations

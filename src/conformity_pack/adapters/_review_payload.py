@@ -1,16 +1,16 @@
 """Shared conversion from an escalated result to an ``review-kit`` Review payload.
 
-Lives in the adapter layer, not the pure domain, because it depends on the kit. EVERY content
-field is redacted BEFORE it leaves the process (the same redact-before-anything rule the audit
-write obeys), using the shared ``pii-kit``, so no raw identifier reaches Hrz7 over the wire;
-Hrz7 redacts again before its own audit write (defence in depth).
+Lives in the adapter layer, not the pure domain, because it depends on the kit. EVERY content field
+is redacted BEFORE it leaves the process (the same redact-before-anything rule the audit write
+obeys), using the shared ``pii-kit``, so no raw identifier reaches human-review-console over the
+wire; human-review-console redacts again before its own audit write (defence in depth).
 
 "Every content field" is the load-bearing word, and it is written here because twice it was not
-true: the citation LOCATOR and TITLE were passed through while the snippet beside them was
-scrubbed, and ``case_ref`` and ``source_key`` were derived from the RAW subject while the subject
-itself was masked. Both times the field's structural-looking name is what hid it. The rule is
-that a field crossing this boundary is content unless it is ATTRIBUTION: ``maker`` and ``tenant``
-are asserted here and trusted by Hrz7 because the caller is an authenticated S2S service (per-hop
+true: the citation LOCATOR and TITLE were passed through while the snippet beside them was scrubbed,
+and ``case_ref`` and ``source_key`` were derived from the RAW subject while the subject itself was
+masked. Both times the field's structural-looking name is what hid it. The rule is that a field
+crossing this boundary is content unless it is ATTRIBUTION: ``maker`` and ``tenant`` are asserted
+here and trusted by human-review-console because the caller is an authenticated S2S service (per-hop
 on-behalf-of token exchange is the deferred next layer), and they are the only two fields a leak
 scan over this payload skips.
 """
@@ -77,7 +77,7 @@ def _kit_citations(result: ConformityResult) -> tuple[KitCitation, ...]:
 
 
 def result_to_review(result: ConformityResult, *, maker: str, tenant: str = "") -> Review:
-    """Build the review a producer submits to Hrz7 when a result escalates.
+    """Build the review a producer submits to human-review-console when a result escalates.
 
     The subject is redacted ONCE and reused for the case reference and the idempotency key, so no
     raw identifier reaches the wire through a DERIVED field. Masking it in ``subject``
@@ -106,6 +106,6 @@ def result_to_review(result: ConformityResult, *, maker: str, tenant: str = "") 
         sod_group="conformity_pack-maker-checker",
         case_ref=subject,
         # Producer-owned, tenant-scoped key so a retried delivery is idempotent at the console.
-        source_key=f"Rgc14:{subject}:{result.severity.value}",
+        source_key=f"ai-act-conformity-pack:{subject}:{result.severity.value}",
         citations=_kit_citations(result),
     )

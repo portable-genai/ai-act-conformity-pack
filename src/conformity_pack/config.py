@@ -443,7 +443,7 @@ class Settings:
     #: that verifies perfectly. Empty means no anchor, which is right for the ephemeral
     #: ``:memory:`` store and wrong for anything durable.
     audit_anchor_path: str = ""
-    #: Base URL of the Hrz7 Human-Review console the R8 producer path submits to.
+    #: Base URL of the human-review-console Human-Review console the R8 producer path submits to.
     review_url: str = ""
     #: The audience the managed IAP identity adapter verifies the signed assertion AGAINST: the
     #: IAP-protected resource, ``/projects/<NUM>/global/backendServices/<ID>`` behind an HTTPS
@@ -460,13 +460,15 @@ class Settings:
     #: a trace resource path. Empty is valid: on Cloud Run the exporter resolves it
     #: from the metadata server.
     project_id: str = ""
-    #: Base URL of the Hrz3 agent registry the managed registry adapter reads the fleet from.
+    #: Base URL of the agent-registry the managed registry adapter reads the fleet from.
     registry_url: str = ""
-    #: Base URL of the Rgc7 obligations service the managed obligations adapter reads from.
+    #: Base URL of the obligations-control-mapping service the managed obligations adapter reads
+    #: from.
     obligations_url: str = ""
     #: Base URL of the platform evidence surface the managed evidence adapter harvests from.
     evidence_url: str = ""
-    #: Base URL of the Rsk1 horizon feed the managed horizon adapter reads changes from.
+    #: Base URL of the compliance-advisory horizon feed the managed horizon adapter reads changes
+    #: from.
     horizon_url: str = ""
     #: BigQuery dataset (``project.dataset``) the managed matrix store persists lineage into.
     matrix_dataset: str = ""

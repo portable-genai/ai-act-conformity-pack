@@ -1,6 +1,6 @@
 """The deterministic obligation-applicability engine (pure stdlib, replayable).
 
-For each (system, obligation) pair over the Rgc7 obligations graph, this decides APPLIES,
+For each (system, obligation) pair over the obligations-control-mapping graph, this decides APPLIES,
 NOT_APPLICABLE or CONDITIONAL with explicit reasons, fail-closed on unknowns, worst-wins across
 jurisdictions. The mechanism is the same set-membership reasoning as :mod:`.risk_tier`: an
 obligation binds when its framework is one the system is subject to, the system's tier is at or
