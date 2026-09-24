@@ -7,6 +7,7 @@ import sys
 
 from hex_service_kit.logging import configure_logging
 
+from ..adapters.controls import RecordingReviewRouter
 from ..config import Container, build_container
 from ..domain.conformity_service import ConformityService
 from ..domain.errors import ConformityError
@@ -62,10 +63,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  obligations applying: {result.applies_count}")
         print(f"  evidence gaps: {len(result.gaps)}")
         print(f"  requires_human_review: {result.requires_human_review}")
-        if result.requires_human_review:
-            # Rule R8 on the CLI path too: the same escalation, the same router.
-            ref = container.review_router.route(result, maker=args.actor, tenant=args.tenant)
-            print(f"  routed to human review: {ref}")
+        # Rule R8 on the CLI path too: the same escalation, the same router.
+        routing = RecordingReviewRouter(container.review_router)
+        ref = routing.route(result, maker=args.actor, tenant=args.tenant)
+        print(f"  human review hand-off : {routing.outcome.value} {ref}".rstrip())
         return 0
 
     return 2  # pragma: no cover - argparse requires a subcommand

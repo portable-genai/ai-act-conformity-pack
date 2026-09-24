@@ -67,6 +67,7 @@ from hex_service_kit.web import (
     make_require_service_caller,
 )
 
+from ..adapters.controls import RecordingReviewRouter
 from ..config import (
     LOCAL_PROFILE,
     Container,
@@ -320,12 +321,13 @@ def assess(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
     except ConformityError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
-    review_ref = ""
-    if result.requires_human_review:
-        review_ref = container.review_router.route(
-            result, maker=principal.actor, tenant=principal.tenant
-        )
-    return AssessResponse.from_domain(result, review_ref=review_ref)
+    # The hand-off never fails an already-computed, already-audited assessment; the response
+    # says what happened to it instead (the fleet's runtime-control contract).
+    routing = RecordingReviewRouter(container.review_router)
+    review_ref = routing.route(result, maker=principal.actor, tenant=principal.tenant)
+    return AssessResponse.from_domain(
+        result, review_ref=review_ref, review_routing=routing.outcome.value
+    )
 
 
 @app.post("/v1/audit/ping", dependencies=[Depends(require_service_caller)], tags=["ops"])

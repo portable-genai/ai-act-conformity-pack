@@ -37,9 +37,9 @@ Four things, and none of them is code here:
    Do not build a second one here.
 3. **The evidence feed.** `EvidencePort` harvests the artefacts sufficiency is measured against
    (`model-quality-gate` eval reports, `agent-observability` trails). Offline it serves fixtures.
-4. **The review console.** An `human-review-console` deployment reachable at `HUMAN_REVIEW_URL`. The managed
-   router REFUSES to swallow an escalation when this is empty, so a fork cannot ship rule R8
-   unwired and green.
+4. **The review console.** An `human-review-console` deployment reachable at `HUMAN_REVIEW_URL`. With routing on
+   and this empty, the managed profile REFUSES TO BOOT, so a fork cannot ship rule R8 unwired
+   and green; `CFP_REVIEW_ROUTING=off` is the stated way to run without it.
 
 ### How do I add a new outbound dependency (a new port)?
 
