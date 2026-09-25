@@ -8,6 +8,8 @@ offline profiles import this module with no SDK installed and the offline gate s
 
 from __future__ import annotations
 
+from hex_service_kit import provenance
+
 from ...config import Settings
 
 
@@ -22,7 +24,7 @@ class CloudNarratorAdapter:
         from google import genai
 
         client = genai.Client()
-        response = client.models.generate_content(
-            model=self._settings.narrator_model, contents=prompt
-        )
+        model = self._settings.narrator_model
+        response = client.models.generate_content(model=model, contents=prompt)
+        provenance.note_model(model)
         return str(response.text)

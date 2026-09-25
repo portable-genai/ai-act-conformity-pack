@@ -7,6 +7,8 @@ method so the offline profiles import this module with no SDK installed.
 
 from __future__ import annotations
 
+from hex_service_kit import provenance
+
 from ...config import Settings
 from ...domain.kernel import Citation
 
@@ -22,9 +24,11 @@ class CloudRetrievalAdapter:
         from google import genai
 
         client = genai.Client()
-        response = client.models.generate_content(
-            model=self._settings.narrator_model, contents=query
-        )
+        model = self._settings.narrator_model
+        response = client.models.generate_content(model=model, contents=query)
+        # A model answered this call. No ONLINE search tool is attached (File Search reads the
+        # managed knowledge base, and this thin path attaches no tool at all), so no search note.
+        provenance.note_model(model)
         # A real File Search response carries grounding chunks; this thin path returns the model
         # text as one snippet. The offline profile is the ground truth for the eval.
         return (
