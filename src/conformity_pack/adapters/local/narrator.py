@@ -15,16 +15,23 @@ from __future__ import annotations
 
 import json
 
+from hex_service_kit import provenance
+
 from ...config import Settings
 
 
 class LocalNarratorAdapter:
     """A deterministic, model-free narrator for the ``local`` profile."""
 
+    #: What this narrator answers as, for the console's model pill: the name ``generator_model``
+    #: reports under ``local``, so the pill before and after an answer agree.
+    MODEL = "deterministic-offline-stub"
+
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
 
     def narrate(self, prompt: str) -> str:
+        provenance.note_model(self.MODEL)
         facts, figures, sources = _parse_prompt(prompt)
         narrative = (
             f"{facts.get('system', 'the system')} is classified {facts.get('tier', 'unknown')}"
