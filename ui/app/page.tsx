@@ -28,6 +28,20 @@ function reviewRoutingOf(body: string): string | undefined {
   }
 }
 
+// The AI systems the local profile's fixture registry holds (`adapters/local/fleet_fixtures.py`),
+// offered as suggestions because the API serves no list of them. The field stays free text: under
+// a managed profile the registry is the live agent-registry, and the service answers 404 for a
+// name it does not hold. The two cards planted for the redaction proofs are left out on purpose.
+const KNOWN_SYSTEMS = [
+  "credit-decision-copilot",
+  "hr-cv-screener",
+  "social-scoring-pilot",
+  "market-insights-chatbot",
+  "internal-reporting-helper",
+  "undeclared-analytics",
+  "model-risk-validation",
+];
+
 interface CardSummary {
   name?: string;
   description?: string;
@@ -36,8 +50,8 @@ interface CardSummary {
 
 export default function Home() {
   const [persona, setPersona] = useState(PERSONAS[0]);
-  const [subject, setSubject] = useState("Acme Holdings (FICTIONAL)");
-  const [text, setText] = useState("urgent data breach reported by the branch");
+  const [system, setSystem] = useState(KNOWN_SYSTEMS[0]);
+  const [asOf, setAsOf] = useState("");
   const [result, setResult] = useState("");
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -62,10 +76,12 @@ export default function Home() {
     setBusy(true);
     setFailed(false);
     try {
-      const response = await fetch(API + "/v1/triage", {
+      // `AssessRequest` is the whole request: the system is resolved by name from the registry,
+      // and the actor and tenant come from the verified principal, never from this body.
+      const response = await fetch(API + "/v1/assess", {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Dev-Persona": persona },
-        body: JSON.stringify({ subject, text }),
+        body: JSON.stringify({ system: system.trim(), as_of: asOf }),
       });
       const body = await response.text();
       setFailed(!response.ok);
@@ -83,7 +99,7 @@ export default function Home() {
       <h1>{card?.name ?? "Agent console"}</h1>
       <p className="sub">
         {card?.description ??
-          "Submit a case. The decision is deterministic, cited, and routed to a human reviewer when it escalates."}
+          "Assess an AI system. The tier and obligations are deterministic, cited, and routed to a human reviewer when they escalate."}
       </p>
 
       <form onSubmit={submit}>
@@ -102,17 +118,26 @@ export default function Home() {
         </fieldset>
 
         <fieldset>
-          <legend>The case</legend>
+          <legend>The AI system</legend>
           <label>
-            Subject
-            <input value={subject} onChange={(event) => setSubject(event.target.value)} />
+            System name, as registered (suggestions are the local fixture fleet)
+            <input
+              value={system}
+              list="known-systems"
+              onChange={(event) => setSystem(event.target.value)}
+            />
+            <datalist id="known-systems">
+              {KNOWN_SYSTEMS.map((name) => (
+                <option key={name} value={name} />
+              ))}
+            </datalist>
           </label>
           <label>
-            Description
-            <textarea value={text} onChange={(event) => setText(event.target.value)} />
+            As of (optional; stamps the persisted obligation matrix with this date)
+            <input type="date" value={asOf} onChange={(event) => setAsOf(event.target.value)} />
           </label>
-          <button type="submit" disabled={busy}>
-            {busy ? "Working" : "Triage this case"}
+          <button type="submit" disabled={busy || !system.trim()}>
+            {busy ? "Working" : "Assess this system"}
           </button>
         </fieldset>
       </form>
