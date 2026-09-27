@@ -95,6 +95,7 @@ def test_a_hallucinated_figure_never_changes_a_consequential_field() -> None:
         retrieval=container.retrieval,
         narrator=_AdversarialNarrator(),
         tracer=container.tracer,
+        guardrail=container.guardrail,
     )
     a = honest.assess(
         sample_cases.ESCALATING_CASE, actor=sample_cases.ACTOR, tenant=sample_cases.TENANT
@@ -141,6 +142,7 @@ def test_an_empty_retrieval_is_a_hard_error_not_an_invented_narrative() -> None:
         retrieval=_EmptyRetrieval(),
         narrator=container.narrator,
         tracer=container.tracer,
+        guardrail=container.guardrail,
     )
     with pytest.raises(EmptyRetrievalError):
         service.assess(

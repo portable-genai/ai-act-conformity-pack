@@ -24,7 +24,7 @@ from pii_kit import redact
 from ..adapters.controls import RecordingReviewRouter
 from ..config import Container, Settings, build_container
 from ..domain.conformity_service import ConformityService
-from ..domain.errors import ConformityError
+from ..domain.errors import ConformityError, GuardrailBlockedError
 from ..domain.models import AiSystemInput
 from ..domain.pii import PII_PATTERNS
 
@@ -49,6 +49,7 @@ def _service(container: Container) -> ConformityService:
         retrieval=container.retrieval,
         narrator=container.narrator,
         tracer=container.tracer,
+        guardrail=container.guardrail,
         matrix_store=container.matrix_store,
     )
 
@@ -99,13 +100,17 @@ def assess_system(
       goes into a model's context), plus ``review_ref``: where the escalation WENT, and
       ``review_routing``: routed, failed, off or not_required, so a caller can tell a routed
       escalation from a flag nobody read. The reference is empty exactly when
-      ``review_routing`` is not ``routed``.
+      ``review_routing`` is not ``routed``. When the guardrail blocks either direction of either
+      Gemini-calling step (rule R1), the block is already audited and this returns
+      ``{"blocked": True, "reason": <str>}`` instead: never a partial assessment.
     """
     container = _container(settings)
     try:
         result = _service(container).assess(
             AiSystemInput(system=system), actor=actor, tenant=tenant, as_of=as_of
         )
+    except GuardrailBlockedError as exc:
+        return {"blocked": True, "reason": str(exc)}
     except ConformityError as exc:
         return {"error": str(exc), "system": system}
     routing = RecordingReviewRouter(container.review_router)

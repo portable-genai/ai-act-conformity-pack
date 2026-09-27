@@ -61,7 +61,7 @@ routes escalations in the same call, so rule R8 does not hold on four surfaces o
 | Model and agent promotion | `model-quality-gate` AI quality and model risk | `eval/run_eval.py --mode gate` asks `model-quality-gate`; the offline smoke mode never promotes. |
 | Traces and the immutable audit sink | `agent-observability` agent observability | `AuditSinkPort` and `ObservabilityTracerPort`. |
 | Human review and maker-checker | `human-review-console` human review console | `ReviewRouterPort` over the shared `review-kit`. This repo produces escalations; it does not render a queue. |
-| Prompt-injection defence and output filtering | `agent-guardrail-gateway` agent guardrail gateway | **not wired today.** It becomes mandatory the moment untrusted free text reaches the narrator (rule R1). |
+| Prompt-injection defence and output filtering | `agent-guardrail-gateway` agent guardrail gateway | `GuardrailPort` (rule R1): both Gemini-calling steps screened in both directions, through a regional Model Armor template under `gcp`. |
 | Grounded retrieval over an enterprise corpus | `enterprise-knowledge-base` | not wired today; `RetrievalPort` serves the local corpus offline. |
 
 ### Can I demo it without a cloud project?
@@ -76,5 +76,5 @@ narrated claim, so a claim that stops being true fails a build rather than a mee
 
 The honest list is [`../practices-audit.md`](../practices-audit.md) and the `TODO (repo owner)`
 rows in [`../../COMPLIANCE.md`](../../COMPLIANCE.md). The two that matter most for a production
-decision: the `agent-guardrail-gateway` binding (needed before untrusted text reaches the narrator), and
-registering this repo's metric bundle with `model-quality-gate` so `--mode gate` has an authority to ask.
+decision: registering this repo's metric bundle with `model-quality-gate` so `--mode gate` has an
+authority to ask.

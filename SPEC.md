@@ -29,6 +29,12 @@ Locked decisions, pinned stack, contracts. This document is the deepest authorit
   with routing on and no console configured; `CFP_REVIEW_ROUTING=off` is the stated way to
   run without routing, and a hand-off that fails at request time is reported as `failed` and
   logged rather than failing the request.
+- **Guardrail (R1)**: both Gemini-calling steps are screened through `GuardrailPort` in both
+  directions: the system name, the retrieval query and the narration prompt as sent INPUT;
+  every grounding snippet and the narrated reply OUTPUT. A block, or a screen that could not
+  decide, is audited `Decision.BLOCKED` and refuses the assessment, never a partial result and
+  never the deterministic narrative in its place. `CFP_GUARDRAIL` switches it (default on); the
+  managed profile refuses to boot with it on and no Model Armor template named.
 - **Profile**: resolved ONCE, at import, into a `ProfileChoice` and never a bare string. Three
   states of `CFP_PROFILE`: UNSET is NO CHOICE (the SDK-free adapters
   still bind, but the seeded personas are refused, no service-to-service scheme is selected, every

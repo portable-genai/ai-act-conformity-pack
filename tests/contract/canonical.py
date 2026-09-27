@@ -30,6 +30,8 @@ from conformity_pack.domain.kernel import (
     AuditEvent,
     Citation,
     Decision,
+    Direction,
+    GuardrailVerdict,
     Severity,
 )
 from conformity_pack.domain.models import (
@@ -75,6 +77,10 @@ CANONICAL_CELL = ApplicabilityCell(
 #: The inbound transport context every identity implementation is handed.
 CANONICAL_CONTEXT = RequestContext(headers={"x-dev-persona": "auditor"})
 
+#: Benign text every guardrail implementation is handed: it must not match the local family's
+#: own block patterns, or the "offline family answers" case would look identical to a block.
+CANONICAL_GUARDRAIL_TEXT = "please summarise the applicable obligations for the branch"
+
 
 @dataclass(frozen=True, slots=True)
 class PortCase:
@@ -93,6 +99,18 @@ def _audit_invoke(adapter: Any) -> Any:
 def _audit_answered(adapter: Any, _result: Any) -> bool:
     stored = adapter.log.read_all()
     return bool(stored) and stored[-1]["actor"] == sample_cases.ACTOR and adapter.verify().ok
+
+
+def _guardrail_invoke(adapter: Any) -> Any:
+    return adapter.screen(CANONICAL_GUARDRAIL_TEXT, Direction.INPUT)
+
+
+def _guardrail_answered(_adapter: Any, result: Any) -> bool:
+    return (
+        isinstance(result, GuardrailVerdict)
+        and result.allowed
+        and result.sanitized_text == CANONICAL_GUARDRAIL_TEXT
+    )
 
 
 def _identity_invoke(adapter: Any) -> Any:
@@ -197,6 +215,13 @@ CANONICAL_CALLS: dict[str, PortCase] = {
         answered=_audit_answered,
         managed_refusal=(ImportError,),
         detail="write one already-redacted WORM record",
+    ),
+    "guardrail": PortCase(
+        invoke=_guardrail_invoke,
+        answered=_guardrail_answered,
+        # The lazy `google.cloud` import is the first thing the managed adapter does.
+        managed_refusal=(ImportError,),
+        detail="screen one benign generation call and allow it unchanged",
     ),
     "identity": PortCase(
         invoke=_identity_invoke,

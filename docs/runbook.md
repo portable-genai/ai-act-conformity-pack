@@ -153,6 +153,37 @@ not fail the request: the response carries `review_routing: "failed"` and an emp
 the failure is logged, and the console says the assessment is not queued for review. Terraform
 states the switch as `review_routing_enabled`.
 
+### Guardrail (rule R1)
+
+`ports/guardrail.py` screens both Gemini-calling steps in both directions
+(`domain/conformity_service.py`): the assessed system's name on its own and the retrieval query
+INPUT before the retrieval call, every grounding snippet it returns OUTPUT, the narration prompt
+INPUT as sent, and the narrated reply OUTPUT before it is schema-validated. Each screen's
+`sanitized_text` is the text used from then on, exactly as given. Under `gcp` it calls a regional
+Model Armor template (`config/settings.yaml` `model_armor.template_id`, on the regional host
+`model_armor.host`, never the global endpoint); `infra/terraform/model_armor.tf` creates that
+template, gated on `var.model_armor_full_capabilities` for the malicious-URI filter and
+multi-language detection, which not every region serves: `asia-southeast1` refuses them, so a
+deployment there sets `model_armor_full_capabilities = false` (see `terraform.tfvars.example`).
+
+The managed guardrail fails CLOSED. It allows only on an explicit `NO_MATCH_FOUND` from a screen
+where every filter ran (`invocation_result` `SUCCESS`); a match, an absent or undecided result, a
+`PARTIAL` or `FAILURE` screen (a filter skipped for size or language, or erroring, reports no
+match), and any API error all refuse, and every call carries a deadline
+(`model_armor.timeout_seconds`, 10 s by default) so a stalled backend refuses rather than hangs.
+A blocked direction is audited `Decision.BLOCKED` before the raise reaches the caller, never a
+partial assessment, and the narration's deterministic fallback never stands in for a refusal; a
+guardrail that raised instead of deciding is audited `BLOCKED` with
+`guardrail unavailable (<error>)` and its own error then reaches the caller (a 500 from the API).
+On a block the API answers 400, the CLI prints to stderr and exits 1, and the agent tool returns
+`{"blocked": true, "reason": <str>}`.
+
+`CFP_GUARDRAIL` switches the guardrail, read in the same three states as review routing: unset
+is on, `true`/`false` (or `on`/`off`) wins, and an emptied or unrecognised value refuses at boot.
+Off binds `DisabledGuardrail`, which allows everything unchanged, and logs one warning at
+startup. With the guardrail on and no Model Armor template configured, the managed profile
+REFUSES TO BOOT. Terraform states the switch as `guardrail_enabled`.
+
 ## Supply chain
 Installs come from the committed lockfiles. After changing a dependency run `make lock` and commit
 both files, then `make audit` (`pip-audit` over both locks). CI runs the same audit as a hard

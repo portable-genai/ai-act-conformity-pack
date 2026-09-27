@@ -8,6 +8,22 @@ and a consequential result (a high-risk or prohibited classification, an undecid
 evidence gap on a system asserting conformity) sets ``requires_human_review`` so the surface routes
 it to human-review-console under rule R8. It never auto-executes.
 
+Rule R1: the guardrail screens BOTH directions of BOTH generation-shaped calls this service makes
+to Gemini. INPUT, before either call: the assessed system's name on its own (the one
+caller-supplied field, and it reaches the narration prompt, the summary and the audit record by
+itself), then the retrieval query :meth:`_ground` sends, then the narration prompt
+:meth:`_narrate` sends, AS SENT, with the screened name and screened grounding joined into it.
+OUTPUT, after each call: every grounding snippet the retrieval returns, before it reaches the
+prompt or a citation, and the narrated reply, before it is even schema-validated. The text each
+screen hands back is the text used from then on, exactly as given.
+
+A blocked direction is audited ``Decision.BLOCKED`` and raises
+:class:`~.errors.GuardrailBlockedError`, never a partial or substitute result: the narration's
+deterministic fallback covers a FAILED narrator, not a refused one. A guardrail that cannot
+decide (its backend errored or timed out, or the on-prem placeholder is bound) fails CLOSED the
+same way: the refusal is audited BLOCKED when the audit sink can take it, and the guardrail's own
+error then reaches the caller.
+
 Determinism is the invariant: with the narrator adapter stubbed the pack's figures are identical,
 because the figures never came from the model. :meth:`assess` is replayable given the same
 ``as_of`` and the same port fixtures.
@@ -15,10 +31,13 @@ because the figures never came from the model. :meth:`assess` is replayable give
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from pii_kit import redact
 
 from ..ports.audit import AuditSinkPort
 from ..ports.evidence import EvidencePort
+from ..ports.guardrail import GuardrailPort
 from ..ports.matrix_store import MatrixStorePort
 from ..ports.narrator import NarratorPort
 from ..ports.obligations import ObligationsPort
@@ -28,8 +47,13 @@ from ..ports.retrieval import RetrievalPort
 from . import applicability as applicability_engine
 from . import risk_tier as risk_tier_engine
 from . import sufficiency as sufficiency_engine
-from .errors import ConformityError, EmptyRetrievalError, UngroundedNarrativeError
-from .kernel import AuditEvent, Citation, Decision, utcnow
+from .errors import (
+    ConformityError,
+    EmptyRetrievalError,
+    GuardrailBlockedError,
+    UngroundedNarrativeError,
+)
+from .kernel import AuditEvent, Citation, Decision, Direction, GuardrailVerdict, Severity, utcnow
 from .models import (
     AiSystemCard,
     AiSystemInput,
@@ -71,6 +95,7 @@ class ConformityService:
         retrieval: RetrievalPort,
         narrator: NarratorPort,
         tracer: ObservabilityTracerPort,
+        guardrail: GuardrailPort,
         matrix_store: MatrixStorePort | None = None,
         pack_name: str = DEFAULT_PACK,
     ) -> None:
@@ -81,6 +106,7 @@ class ConformityService:
         self._retrieval = retrieval
         self._narrator = narrator
         self._tracer = tracer
+        self._guardrail = guardrail
         self._matrix_store = matrix_store
         self._pack_name = pack_name
 
@@ -132,8 +158,15 @@ class ConformityService:
             )
 
             citations = _collect_citations(verdict, cells, sufficiency)
-            grounding = self._ground(verdict)
-            narrative = self._narrate(verdict, cells, gaps, citations, grounding)
+            # Rule R1, INPUT: the system name is the caller-supplied field and reaches the
+            # narration prompt on its own, so it is screened before either Gemini call. A refusal
+            # here records no subject, because the subject is the very thing refused.
+            severity = severity_for_tier(verdict.tier)
+            subject = self._screen(verdict.system, Direction.INPUT, actor=actor, severity=severity)
+            grounding = self._ground(verdict, subject=subject, actor=actor)
+            narrative = self._narrate(
+                verdict, cells, gaps, citations, grounding, subject=subject, actor=actor
+            )
 
             summary = (
                 f"{card.name}: {verdict.tier.value}-risk, "
@@ -181,23 +214,112 @@ class ConformityService:
                 narrative=narrative,
             )
 
+    # ------------------------------------------------------------------ guardrail (rule R1)
+    def _screen(
+        self,
+        text: str,
+        direction: Direction,
+        *,
+        actor: str,
+        severity: Severity,
+        subject: str | None = None,
+    ) -> str:
+        """Screen one text in one direction; return the text to use from here on, or refuse.
+
+        The returned text is the verdict's ``sanitized_text`` exactly as given, including an
+        empty string: a screen that redacted everything has not asked for the original back.
+        A block, and a guardrail that raised instead of deciding, both fail closed after an
+        audited BLOCKED record (rule R1/R2). ``subject`` is what the record may name, and is
+        ``None`` until the subject has itself passed the INPUT screen.
+        """
+        try:
+            verdict: GuardrailVerdict = self._guardrail.screen(text, direction)
+        except Exception as exc:
+            reason = f"guardrail unavailable ({type(exc).__name__})"
+            try:
+                self._audit_blocked(actor, direction, reason, subject=subject, severity=severity)
+            except Exception as audit_exc:
+                exc.add_note(f"the BLOCKED audit record could not be written: {audit_exc!r}")
+            raise
+        if not verdict.allowed or verdict.sanitized_text is None:
+            reason = verdict.reason or f"conformity {direction.value} blocked by guardrail"
+            self._audit_blocked(actor, direction, reason, subject=subject, severity=severity)
+            raise GuardrailBlockedError(reason)
+        return verdict.sanitized_text
+
+    def _audit_blocked(
+        self,
+        actor: str,
+        direction: Direction,
+        reason: str,
+        *,
+        subject: str | None,
+        severity: Severity,
+    ) -> None:
+        """Audit a guardrail refusal BEFORE the raise reaches the caller (rule R1/R2).
+
+        Never carries the refused text: only that a refusal happened, in which direction, and
+        why, plus the subject once it has itself passed the INPUT screen. A refused attempt is a
+        security-relevant event the WORM trail must hold even though the request as a whole
+        never produced an assessment.
+        """
+        what = f"{subject}: blocked" if subject is not None else "blocked"
+        self._audit.record(
+            AuditEvent(
+                action="conformity_assess",
+                actor=actor,
+                decision=Decision.BLOCKED,
+                severity=severity,
+                redacted_summary=redact(f"{what} ({direction.value}): {reason}", PII_PATTERNS),
+                citations=(),
+                timestamp=utcnow(),
+            )
+        )
+
     # ------------------------------------------------------------------ grounding + narration
-    def _ground(self, verdict: TierVerdict) -> tuple[Citation, ...]:
+    def _ground(self, verdict: TierVerdict, *, subject: str, actor: str) -> tuple[Citation, ...]:
         """Retrieve the rule text the narrative may cite; empty retrieval is a hard error (P-05).
 
         The query always carries the tier token, and the fixture / File Search KB always answers
         a tier token, so a genuinely empty result means the KB is misconfigured, not that the
         system is out of scope, and inventing a narrative over nothing is exactly what P-05
         forbids.
+
+        Rule R1: this is one of the two Gemini-calling steps (the managed retrieval adapter
+        calls Gemini directly, see ``adapters/gcp/retrieval.py``), so the query is screened
+        INPUT before the call, and each snippet it returns is screened OUTPUT after it and
+        carried forward as the screen handed it back, before any of it reaches the narration
+        prompt or a citation.
         """
-        query = " ".join((verdict.tier.value, *verdict.applicable_frameworks))
+        severity = severity_for_tier(verdict.tier)
+        query = self._screen(
+            " ".join((verdict.tier.value, *verdict.applicable_frameworks)),
+            Direction.INPUT,
+            actor=actor,
+            subject=subject,
+            severity=severity,
+        )
         grounding = self._retrieval.search(query)
         if not grounding:
             raise EmptyRetrievalError(
                 f"the knowledge base returned nothing for {query!r}; a grounded narrative cannot "
                 "be drafted over an empty retrieval (P-05)"
             )
-        return grounding
+        return tuple(
+            replace(
+                citation,
+                snippet=self._screen(
+                    citation.snippet,
+                    Direction.OUTPUT,
+                    actor=actor,
+                    subject=subject,
+                    severity=severity,
+                ),
+            )
+            if citation.snippet
+            else citation
+            for citation in grounding
+        )
 
     def _narrate(
         self,
@@ -206,16 +328,28 @@ class ConformityService:
         gaps: tuple[str, ...],
         citations: tuple[Citation, ...],
         grounding: tuple[Citation, ...],
+        *,
+        subject: str,
+        actor: str,
     ) -> str:
         """Phrase the narrative via the model, validated; fall back to the grounded template.
 
         The model output is validated against the engine's closed sets and DISCARDED on failure,
         so a hallucinated figure never survives. The fallback is built purely from engine facts,
         which is also why swapping the narrator cannot change a consequential number.
+
+        Rule R1: the narration prompt is screened INPUT, as sent, before it reaches the model,
+        and the model's raw reply is screened OUTPUT immediately after, before it is even
+        schema-validated. Both screens sit OUTSIDE the fallback's ``try``: a guardrail refusal,
+        and a guardrail that raised instead of deciding (the on-prem placeholder raises
+        ``NotImplementedError``, which the fallback would otherwise swallow), is a
+        security-relevant refusal, not a narrator failure, so it propagates rather than being
+        papered over with the deterministic template.
         """
+        severity = severity_for_tier(verdict.tier)
         interim = ConformityResult(
-            subject=verdict.system,
-            severity=severity_for_tier(verdict.tier),
+            subject=subject,
+            severity=severity,
             decision=Decision.ALLOWED,
             summary="",
             requires_human_review=False,
@@ -227,13 +361,27 @@ class ConformityService:
         )
         grounding_sources = frozenset(c.source_id for c in grounding)
         context = NarrationContext.from_result(interim, grounding_sources)
-        prompt = build_prompt(context, tuple(c.snippet for c in grounding if c.snippet))
+        prompt = self._screen(
+            build_prompt(context, tuple(c.snippet for c in grounding if c.snippet)),
+            Direction.INPUT,
+            actor=actor,
+            subject=subject,
+            severity=severity,
+        )
         try:
             reply = self._narrator.narrate(prompt)
-            return validate_narration(reply, context)
         except (UngroundedNarrativeError, NotImplementedError, RuntimeError, ValueError):
             # A failed, unreachable or unimplemented narrator never blocks a pack: the grounded
             # deterministic narrative stands in, and it carries only engine figures.
+            return deterministic_narrative(interim)
+        reply = self._screen(
+            reply, Direction.OUTPUT, actor=actor, subject=subject, severity=severity
+        )
+        try:
+            return validate_narration(reply, context)
+        except UngroundedNarrativeError:
+            # A screened reply that cites a figure or source the engines never produced is
+            # discarded for the same grounded fallback.
             return deterministic_narrative(interim)
 
 

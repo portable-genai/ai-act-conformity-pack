@@ -49,8 +49,10 @@ The narrator is reachable through exactly one port (`ports/narrator.py`), it rec
 built from engine facts and grounding snippets and nothing else, and its reply is parsed and
 REJECTED unless every figure it cites is one the engine produced and every source it cites was
 retrieved (`domain/prompts.py:validate_narration`). A rejected reply is discarded, not repaired.
-Prompt-injection screening through the `agent-guardrail-gateway` is **not** wired yet, so untrusted
-free text should not be fed to the narrator until it is (rule R1 in `COMPLIANCE.md`).
+Every input to and output from the two Gemini-calling steps (retrieval and narration) is
+screened by `ports/guardrail.py`, through a regional Model Armor template under `gcp` (rule R1 in
+`COMPLIANCE.md`). A block, or a screen that could not decide, is audited `BLOCKED` and refuses the
+assessment; it is never papered over with the deterministic narrative.
 
 ### How is the audit trail protected?
 
@@ -77,7 +79,8 @@ a regular expression cannot tell apart.
 
 - **Login.** This repo authenticates nobody itself: the platform in front of it does, and the UI
   forwards the assertion without parsing or trusting a parsed copy.
-- **Injection defence and output filtering.** Owned by `agent-guardrail-gateway`; not bound yet.
+- **Injection defence and output filtering.** Owned by `agent-guardrail-gateway`; this repo binds
+  it through `GuardrailPort` (Model Armor under `gcp`) and owns none of the filters.
 - **The review queue.** Owned by `human-review-console`; this repo produces escalations and routes them.
 - **Network egress control.** VPC-SC governs access to Google APIs across perimeters, not
   arbitrary internet egress. The private-egress rule that lets this service reach the `human-review-console` and nothing else is an adopter network decision, called out in `COMPLIANCE.md` P-01.

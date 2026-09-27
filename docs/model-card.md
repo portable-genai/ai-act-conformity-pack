@@ -55,10 +55,13 @@ exercising the validation the managed path depends on.
   stub narrator against the golden cases. Add a managed-profile run, registered with the `model-quality-gate`
   promotion gate (P-08, rule R5), that scores narrative groundedness against the same golden
   cases with the real model bound.
-- **Prompt-injection screening** (rule R1): the `agent-guardrail-gateway` is not bound. Screen any
-  untrusted free text (a supplier-written system description, an uploaded evidence summary)
-  before it reaches `build_prompt`, and fail closed to deterministic-only when the screen is
-  unavailable.
+- **Prompt-injection screening** (rule R1): bound. `ports/guardrail.py` screens the system name,
+  the retrieval query and the narration prompt INPUT, and every grounding snippet and the
+  narrated reply OUTPUT, through Model Armor under `gcp`. A block or an unavailable screen
+  refuses the assessment (audited `BLOCKED`); it never falls back to the deterministic
+  narrative. What stays open: the template's filters are Model Armor's, not a screen tuned to
+  supplier-written system descriptions, so an adopter that feeds richer free text to the prompt
+  should review the template's confidence levels against it.
 - **Reasoning trace**: `COMPLIANCE.md` P-07 records that a model's reasoning trace should be
   audited alongside its output. Today the audit record carries the validated narrative and its
   citations, not the prompt and reply pair.

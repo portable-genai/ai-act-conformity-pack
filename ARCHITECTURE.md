@@ -19,7 +19,7 @@ startup and Terraform serving authorization until its live integration test exis
 - `domain/` : pure stdlib, no cloud/framework imports. `kernel.py` (vertical-neutral types,
   `StrEnum` taxonomies from the commons), `models.py` (the conformity artifacts: risk tier, applicability, sufficiency), `pii.py` (the
   jurisdiction pattern selection + order), `risk_tier.py` / `applicability.py` / `sufficiency.py` (the deterministic engines) and `conformity_service.py` (the orchestrator).
-- `ports/` : `@runtime_checkable` Protocols (`AuditSinkPort`, `ReviewRouterPort`; identity uses
+- `ports/` : `@runtime_checkable` Protocols (`AuditSinkPort`, `ReviewRouterPort`, `GuardrailPort`; identity uses
   the commons `IdentityPort`), re-exported once with the `PORT_PROTOCOLS` map. `identity.py` adds
   this service's own identity vocabulary: what an adapter DECLARES about the end-user
   authentication it provides (`VERIFIED` / `CLIENT_ASSERTED` / `UNIMPLEMENTED`), which is what the

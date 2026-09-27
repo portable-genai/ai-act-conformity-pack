@@ -307,6 +307,7 @@ class DemoRun:
             retrieval=self.container.retrieval,
             narrator=self.container.narrator,
             tracer=self.container.tracer,
+            guardrail=self.container.guardrail,
             matrix_store=self.container.matrix_store,
         )
         self.results: list[StepResult] = []
@@ -864,8 +865,13 @@ def _exit_matrix_store(container: Any) -> Any:
     return container.matrix_store.put(TENANT, "2026-08-08", ())
 
 
+def _exit_guardrail(container: Any) -> Any:
+    return container.guardrail.screen("please summarise the obligations", kernel.Direction.INPUT)
+
+
 EXIT_CALLS: dict[str, Callable[[Any], Any]] = {
     "audit": _exit_audit,
+    "guardrail": _exit_guardrail,
     "identity": _exit_identity,
     "review_router": _exit_review,
     "tracer": _exit_tracer,

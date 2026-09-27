@@ -88,7 +88,8 @@ is adoption step 7.
 ### What is still open?
 
 [`../practices-audit.md`](../practices-audit.md) carries the per-check verdict and the work list.
-The two that matter most before production: binding the `agent-guardrail-gateway` (needed before
-untrusted free text reaches the narrator), and registering this repo's metric bundle with `model-quality-gate` so
-`eval/run_eval.py --mode gate` has an authority to ask. The Terraform stack is written, validated
+The one that matters most before production: registering this repo's metric bundle with
+`model-quality-gate` so `eval/run_eval.py --mode gate` has an authority to ask. The guardrail
+(`agent-guardrail-gateway`, rule R1) is bound: provision its Model Armor template with this repo's
+Terraform before the first managed deploy. The Terraform stack is written, validated
 and tested against a mocked provider; it has never been applied.

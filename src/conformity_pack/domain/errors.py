@@ -33,3 +33,12 @@ class TenantScopeError(ConformityError):
     partition exists to prevent, and does it silently. The tenant comes from the VERIFIED
     principal and from nowhere else, so the honest answer when there is none is a refusal.
     """
+
+
+class GuardrailBlockedError(ConformityError):
+    """Raised when the guardrail blocks a generation call's input or output (rule R1).
+
+    A blocked call must never yield a partial or substitute result: ``conformity_service.py``
+    raises this rather than returning an assessment built on unsafe text, and the caller audits
+    the attempt as ``Decision.BLOCKED`` before the raise reaches it.
+    """
