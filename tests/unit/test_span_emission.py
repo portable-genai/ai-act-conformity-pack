@@ -59,6 +59,7 @@ def _assess(case: AiSystemInput) -> tuple[_RecordingTracer, ConformityResult]:
         retrieval=container.retrieval,
         narrator=container.narrator,
         tracer=tracer,  # type: ignore[arg-type]
+        guardrail=container.guardrail,
         matrix_store=container.matrix_store,
     )
     result = service.assess(case, actor=sample_cases.ACTOR, tenant=sample_cases.TENANT)

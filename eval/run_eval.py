@@ -108,6 +108,7 @@ def _service() -> tuple[ConformityService, object]:
         retrieval=container.retrieval,
         narrator=container.narrator,
         tracer=container.tracer,
+        guardrail=container.guardrail,
         matrix_store=container.matrix_store,
     )
     return service, container.audit

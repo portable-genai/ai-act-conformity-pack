@@ -148,9 +148,12 @@ already thin HTTP clients to them:
   routed to it over the shared `review-kit` (rule R8); you wire your endpoint
   (`HUMAN_REVIEW_URL`), you do not re-implement the console.
 
-The guardrail gateway (`agent-guardrail-gateway`) is **not** integrated today. It becomes mandatory the moment
-untrusted free text (a supplier-written system description, say) reaches the narrator: see rule
-R1 in [`../COMPLIANCE.md`](../COMPLIANCE.md).
+The guardrail (`agent-guardrail-gateway`, rule R1) is bound through `ports/guardrail.py`: every
+input to and output from the two Gemini-calling steps is screened, through a regional Model
+Armor template under `gcp`. You provision the template with this repo's Terraform
+(`infra/terraform/model_armor.tf`) and state `CFP_GUARDRAIL`; see rule R1 in
+[`../COMPLIANCE.md`](../COMPLIANCE.md) and the guardrail section of
+[`runbook.md`](runbook.md).
 
 ## 6. Adoption checklist
 

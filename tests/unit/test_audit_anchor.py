@@ -58,6 +58,7 @@ def _service_over(audit: AuditSinkPort, settings: Settings) -> ConformityService
         retrieval=container.retrieval,
         narrator=container.narrator,
         tracer=container.tracer,
+        guardrail=container.guardrail,
         matrix_store=container.matrix_store,
     )
 

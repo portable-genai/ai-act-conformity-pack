@@ -79,7 +79,7 @@ from ..config import (
     resolve_profile,
 )
 from ..domain.conformity_service import ConformityService
-from ..domain.errors import ConformityError, TenantScopeError
+from ..domain.errors import ConformityError, GuardrailBlockedError, TenantScopeError
 from ..domain.models import AiSystemInput
 from ..ports.identity import VERIFIED, EndUserAuthUnavailableError
 from .schemas import AssessRequest, AssessResponse, HealthResponse
@@ -294,6 +294,7 @@ def _service(container: Container) -> ConformityService:
         retrieval=container.retrieval,
         narrator=container.narrator,
         tracer=container.tracer,
+        guardrail=container.guardrail,
         matrix_store=container.matrix_store,
     )
 
@@ -313,6 +314,10 @@ def assess(
     Check C2: the tenant the persisted matrix is partitioned by comes from ``principal.tenant``
     and from nowhere else. ``AssessRequest`` carries no ``tenant`` and no ``actor`` field, so
     there is nothing for a client to assert and nothing here to discard.
+
+    Rule R1: the guardrail screens both Gemini-calling steps (retrieval and narration) in both
+    directions (``domain/conformity_service.py``). A blocked direction is already audited
+    BLOCKED inside the service and answers 400 here, never a partial assessment.
     """
     container = _container()
     try:
@@ -328,6 +333,10 @@ def assess(
         # resolves exactly that way), so a tenant-partitioned lineage write cannot be attributed
         # and is refused. Ordered before ConformityError because it is a subclass of it.
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+    except GuardrailBlockedError as exc:
+        # 400, not 404: the system exists and the request is well-formed, but the text it
+        # carried was refused. Ordered before ConformityError because it is a subclass of it.
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     except ConformityError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     # The hand-off never fails an already-computed, already-audited assessment; the response

@@ -126,6 +126,11 @@ Hexagonal, ports and adapters:
   all route in the same call that produced the result. `tests/unit/test_review_routing.py` is the
   standing gate; a local router that silently did nothing would let a producer ship R8 unwired
   and green.
+- **Rule R1: every generation call is screened, both ways.** `ConformityService` screens the
+  system name, the retrieval query and the narration prompt INPUT, and each grounding snippet
+  and the narrated reply OUTPUT, through `GuardrailPort`. A new call to a model goes through
+  `_screen` on both sides; a refusal is audited `BLOCKED` and raises, and the narration fallback
+  must never catch it. `tests/unit/test_guardrail_screening.py` is the standing gate.
 - **The demo is code, and every narrated claim is checked.** A step lives in `demo.STEPS` and in
   `walkthrough.CHECKS`, and `tests/unit/test_demo_surface.py` holds the two equal, so a claim the
   demo makes but nobody verifies cannot exist. `make demo-selftest` runs the whole arc headless

@@ -10,7 +10,7 @@ from hex_service_kit.logging import configure_logging
 from ..adapters.controls import RecordingReviewRouter
 from ..config import Container, build_container
 from ..domain.conformity_service import ConformityService
-from ..domain.errors import ConformityError
+from ..domain.errors import ConformityError, GuardrailBlockedError
 from ..domain.models import AiSystemInput
 
 
@@ -23,6 +23,7 @@ def _service(container: Container) -> ConformityService:
         retrieval=container.retrieval,
         narrator=container.narrator,
         tracer=container.tracer,
+        guardrail=container.guardrail,
         matrix_store=container.matrix_store,
     )
 
@@ -56,6 +57,10 @@ def main(argv: list[str] | None = None) -> int:
                 tenant=args.tenant,
                 as_of=args.as_of,
             )
+        except GuardrailBlockedError as exc:
+            # Rule R1: already audited BLOCKED inside the service. Never a partial assessment.
+            print(f"blocked by guardrail: {exc}", file=sys.stderr)
+            return 1
         except ConformityError as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 1
